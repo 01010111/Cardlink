@@ -2715,15 +2715,11 @@ h2d_Graphics.prototype = $extend(h2d_Drawable.prototype,{
 });
 var Card = function(parent,x,y) {
 	this.held = false;
-	this.padding = 2;
-	this.radius = 2;
-	this.height = 144;
-	this.width = 96;
 	h2d_Graphics.call(this,parent);
 	this.beginFill(0);
-	this.drawRoundedRect(this.padding - 1,this.padding - 1,this.width - this.padding * 2 + 2,this.height - this.padding * 2 + 2,this.radius);
+	this.drawRoundedRect(Constants.PADDING - 1,Constants.PADDING - 1,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 2 + 2,Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 2 + 2,Constants.CARD_R);
 	this.beginFill(16777215);
-	this.drawRoundedRect(this.padding,this.padding,this.width - this.padding * 2,this.height - this.padding * 2,this.radius);
+	this.drawRoundedRect(Constants.PADDING,Constants.PADDING,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 2,Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 2,Constants.CARD_R);
 	this.endFill();
 	this.posChanged = true;
 	this.x = x;
@@ -2740,18 +2736,25 @@ var Card = function(parent,x,y) {
 	this.text.set_textAlign(h2d_Align.Center);
 	var _this1 = this.text;
 	_this1.posChanged = true;
-	_this1.x = this.width * 0.5;
+	_this1.x = Constants.CARD_W * Constants.GRID_W * 0.5;
 	_this1.posChanged = true;
-	_this1.y = this.height * 0.5 - 8;
+	_this1.y = Constants.CARD_H * Constants.GRID_H * 0.5 - 8;
 	var b = new h2d_Graphics(this.back);
 	b.beginFill(0);
-	b.drawRoundedRect(this.padding * 2,this.padding * 2,this.width - this.padding * 4,this.height - this.padding * 4,this.radius);
+	b.drawRoundedRect(Constants.PADDING * 2,Constants.PADDING * 2,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 4,Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 4,Constants.CARD_R);
 	b.endFill();
-	this.hide();
-	var int = new h2d_Interactive(this.width,this.height,this);
-	int.onClick = $bind(this,this.click);
-	int.onRelease = $bind(this,this.release);
-	int.onMove = $bind(this,this.drag);
+	this.int = new h2d_Interactive(Constants.CARD_W * Constants.GRID_W,Constants.CARD_H * Constants.GRID_H,this);
+	this.int.onPush = $bind(this,this.click);
+	this.int.onRelease = $bind(this,this.release);
+	switch(CardUtil.state._hx_index) {
+	case 0:
+		this.reveal();
+		break;
+	case 1:
+		this.hide();
+		break;
+	}
+	CardUtil.add(this);
 };
 $hxClasses["Card"] = Card;
 Card.__name__ = "Card";
@@ -2769,21 +2772,32 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 	}
 	,click: function(e) {
 		var p = this.parent;
-		if(p != null && p.parent != null) {
+		if(p.parent != null) {
 			p.parent.removeChild(p);
 		}
 		p.addChild(this);
-		this.held = true;
-	}
-	,release: function(e) {
-		this.held = false;
+		this.int.startDrag($bind(this,this.drag));
+		this.offset = { x : e.relX, y : e.relY};
 	}
 	,drag: function(e) {
-		if(!this.held) {
-			return;
-		}
+		var _g = this;
+		_g.posChanged = true;
+		_g.x += e.relX - this.offset.x;
+		var _g1 = this;
+		_g1.posChanged = true;
+		_g1.y += e.relY - this.offset.y;
+	}
+	,release: function(e) {
+		this.int.stopDrag();
+		var v = Constants.GRID_W * Math.round(this.x / Constants.GRID_W);
 		this.posChanged = true;
-		this.x = null;
+		this.x = v;
+		var v1 = Constants.GRID_H * Math.round(this.y / Constants.GRID_H);
+		this.posChanged = true;
+		this.y = v1;
+		if(this.x == Constants.GRID_W && this.y == Constants.GRID_H) {
+			this.destroy();
+		}
 	}
 	,reveal: function() {
 		CardUtil.get_data(this);
@@ -2797,8 +2811,18 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 		this.front.alpha = 0;
 		this.flipped = false;
 	}
+	,destroy: function() {
+		CardUtil.remove(this);
+		CardUtil.return_data(this);
+		this.parent.removeChild(this);
+	}
 	,__class__: Card
 });
+var ECardsState = $hxEnums["ECardsState"] = { __ename__ : true, __constructs__ : ["REVEALED","HIDDEN"]
+	,REVEALED: {_hx_index:0,__enum__:"ECardsState",toString:$estr}
+	,HIDDEN: {_hx_index:1,__enum__:"ECardsState",toString:$estr}
+};
+ECardsState.__empty_constructs__ = [ECardsState.REVEALED,ECardsState.HIDDEN];
 var CardUtil = function() { };
 $hxClasses["CardUtil"] = CardUtil;
 CardUtil.__name__ = "CardUtil";
@@ -2840,6 +2864,12 @@ CardUtil.populate_deck = function() {
 		CardUtil.deck.push({ text : card4.text, suit : "special"});
 	}
 };
+CardUtil.add = function(card) {
+	CardUtil.active_cards.push(card);
+};
+CardUtil.remove = function(card) {
+	HxOverrides.remove(CardUtil.active_cards,card);
+};
 CardUtil.shuffle = function(arr) {
 	var _g = 0;
 	var _g1 = arr.length;
@@ -2861,6 +2891,56 @@ CardUtil.get_data = function(card) {
 CardUtil.return_data = function(card) {
 	CardUtil.deck.push(card.get_data());
 };
+CardUtil.reveal = function() {
+	var _g = 0;
+	var _g1 = CardUtil.active_cards;
+	while(_g < _g1.length) {
+		var card = _g1[_g];
+		++_g;
+		card.reveal();
+	}
+	CardUtil.state = ECardsState.REVEALED;
+};
+CardUtil.hide = function() {
+	var _g = 0;
+	var _g1 = CardUtil.active_cards;
+	while(_g < _g1.length) {
+		var card = _g1[_g];
+		++_g;
+		card.hide();
+	}
+	CardUtil.state = ECardsState.HIDDEN;
+};
+var Constants = function() { };
+$hxClasses["Constants"] = Constants;
+Constants.__name__ = "Constants";
+var DiscardPile = function(parent) {
+	h2d_Graphics.call(this,parent);
+	this.lineStyle(1,16711680);
+	this.drawRect(Constants.PADDING * 2,Constants.PADDING * 2,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 4,Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 4);
+	this.posChanged = true;
+	this.x = Constants.GRID_W;
+	this.posChanged = true;
+	this.y = Constants.GRID_H;
+	var text = new h2d_Text(hxd_res_DefaultFont.get(),this);
+	var _this = text.color;
+	_this.x = 1;
+	_this.y = 0.;
+	_this.z = 0.;
+	_this.w = 1.;
+	text.set_textAlign(h2d_Align.Center);
+	text.posChanged = true;
+	text.x = Constants.CARD_W * Constants.GRID_W * 0.5;
+	text.posChanged = true;
+	text.y = Constants.CARD_H * Constants.GRID_H * 0.5 - 8;
+	text.set_text("REMOVE");
+};
+$hxClasses["DiscardPile"] = DiscardPile;
+DiscardPile.__name__ = "DiscardPile";
+DiscardPile.__super__ = h2d_Graphics;
+DiscardPile.prototype = $extend(h2d_Graphics.prototype,{
+	__class__: DiscardPile
+});
 var EReg = function(r,opt) {
 	this.r = new RegExp(r,opt.split("u").join(""));
 };
@@ -2911,29 +2991,74 @@ EReg.prototype = {
 	}
 	,__class__: EReg
 };
-var Grid = function(parent,gridw,gridh,color,alpha) {
+var FlipBtn = function(parent) {
+	this.flipped = false;
+	h2d_Graphics.call(this,parent);
+	this.lineStyle(1,16777215);
+	this.beginFill(0);
+	this.drawRect(Constants.PADDING * 2,Constants.PADDING * 2,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 4,Constants.GRID_H * 2 - Constants.PADDING * 4);
+	this.endFill();
+	this.posChanged = true;
+	this.x = Constants.GRID_W;
+	this.posChanged = true;
+	this.y = Constants.GRID_H + Constants.CARD_H * Constants.GRID_H;
+	this.text = new h2d_Text(hxd_res_DefaultFont.get(),this);
+	var _this = this.text.color;
+	_this.x = 1;
+	_this.y = 1;
+	_this.z = 1;
+	_this.w = 1.;
+	this.text.set_textAlign(h2d_Align.Center);
+	var _this1 = this.text;
+	_this1.posChanged = true;
+	_this1.x = Constants.CARD_W * Constants.GRID_W * 0.5;
+	_this1.posChanged = true;
+	_this1.y = Constants.GRID_H - 8;
+	this.text.set_text("REVEAL");
+	this.int = new h2d_Interactive(Constants.CARD_W * Constants.GRID_W,Constants.GRID_H * 2,this);
+	this.int.onClick = $bind(this,this.click);
+};
+$hxClasses["FlipBtn"] = FlipBtn;
+FlipBtn.__name__ = "FlipBtn";
+FlipBtn.__super__ = h2d_Graphics;
+FlipBtn.prototype = $extend(h2d_Graphics.prototype,{
+	click: function(e) {
+		if(this.flipped) {
+			CardUtil.hide();
+			this.text.set_text("REVEAL");
+		} else {
+			CardUtil.reveal();
+			this.text.set_text("HIDE");
+		}
+		this.flipped = !this.flipped;
+	}
+	,__class__: FlipBtn
+});
+var Grid = function(parent,color,alpha) {
 	if(alpha == null) {
 		alpha = 1;
 	}
 	h2d_Graphics.call(this,parent);
 	this.beginFill(color,alpha);
 	var _g = 1;
-	var _g1 = Math.floor(parent.height / gridh) + 1;
+	var _g1 = Math.floor(parent.height / Constants.GRID_H) + 1;
 	while(_g < _g1) {
 		var j = [_g++];
 		var _g2 = 1;
-		var _g11 = Math.floor(parent.width / gridw) + 1;
+		var _g11 = Math.floor(parent.width / Constants.GRID_W) + 1;
 		while(_g2 < _g11) {
 			var i = [_g2++];
-			this.drawCircle(i[0] * gridw,j[0] * gridh,1);
-			var int = new h2d_Interactive(gridw,gridh,this);
+			this.drawCircle(i[0] * Constants.GRID_W,j[0] * Constants.GRID_H,1);
+			var int = new h2d_Interactive(Constants.GRID_W,Constants.GRID_H,this);
+			var x = i[0] * Constants.GRID_W;
+			var y = j[0] * Constants.GRID_H;
 			int.posChanged = true;
-			int.x = i[0] * gridw;
+			int.x = x;
 			int.posChanged = true;
-			int.y = j[0] * gridh;
+			int.y = y;
 			int.onClick = (function(i1,j1) {
 				return function(e) {
-					Main.i.add_card(i1[0] * gridw,j1[0] * gridh);
+					Main.i.add_card(i1[0] * Constants.GRID_W,j1[0] * Constants.GRID_H);
 					return;
 				};
 			})(i,j);
@@ -3174,7 +3299,9 @@ Main.prototype = $extend(hxd_App.prototype,{
 	init: function() {
 		Main.i = this;
 		CardUtil.populate_deck();
-		new Grid(this.s2d,16,16,16777215,0.25);
+		new Grid(this.s2d,16777215,0.25);
+		new DiscardPile(this.s2d);
+		new FlipBtn(this.s2d);
 	}
 	,add_card: function(x,y) {
 		new Card(this.s2d,x,y);
@@ -19429,6 +19556,72 @@ var h3d_impl_RenderFlag = $hxEnums["h3d.impl.RenderFlag"] = { __ename__ : true, 
 	,CameraHandness: {_hx_index:0,__enum__:"h3d.impl.RenderFlag",toString:$estr}
 };
 h3d_impl_RenderFlag.__empty_constructs__ = [h3d_impl_RenderFlag.CameraHandness];
+var haxe_IMap = function() { };
+$hxClasses["haxe.IMap"] = haxe_IMap;
+haxe_IMap.__name__ = "haxe.IMap";
+var haxe_ds_StringMap = function() {
+	this.h = { };
+};
+$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
+haxe_ds_StringMap.__name__ = "haxe.ds.StringMap";
+haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
+haxe_ds_StringMap.prototype = {
+	setReserved: function(key,value) {
+		if(this.rh == null) {
+			this.rh = { };
+		}
+		this.rh["$" + key] = value;
+	}
+	,getReserved: function(key) {
+		if(this.rh == null) {
+			return null;
+		} else {
+			return this.rh["$" + key];
+		}
+	}
+	,existsReserved: function(key) {
+		if(this.rh == null) {
+			return false;
+		}
+		return this.rh.hasOwnProperty("$" + key);
+	}
+	,remove: function(key) {
+		if(__map_reserved[key] != null) {
+			key = "$" + key;
+			if(this.rh == null || !this.rh.hasOwnProperty(key)) {
+				return false;
+			}
+			delete(this.rh[key]);
+			return true;
+		} else {
+			if(!this.h.hasOwnProperty(key)) {
+				return false;
+			}
+			delete(this.h[key]);
+			return true;
+		}
+	}
+	,keys: function() {
+		return HxOverrides.iter(this.arrayKeys());
+	}
+	,arrayKeys: function() {
+		var out = [];
+		for( var key in this.h ) {
+		if(this.h.hasOwnProperty(key)) {
+			out.push(key);
+		}
+		}
+		if(this.rh != null) {
+			for( var key in this.rh ) {
+			if(key.charCodeAt(0) == 36) {
+				out.push(key.substr(1));
+			}
+			}
+		}
+		return out;
+	}
+	,__class__: haxe_ds_StringMap
+};
 var h3d_impl_InputNames = function(names) {
 	this.id = h3d_impl_InputNames.UID++;
 	this.names = names;
@@ -23036,6 +23229,35 @@ h3d_mat_Stencil.prototype = {
 		this.set_reference(this.maskBits >> 16 & 255);
 	}
 	,__class__: h3d_mat_Stencil
+};
+var haxe_ds_IntMap = function() {
+	this.h = { };
+};
+$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
+haxe_ds_IntMap.__name__ = "haxe.ds.IntMap";
+haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
+haxe_ds_IntMap.prototype = {
+	remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) {
+			return false;
+		}
+		delete(this.h[key]);
+		return true;
+	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) this.h.hasOwnProperty(key) ? a.push(key | 0) : null;
+		return HxOverrides.iter(a);
+	}
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
+	,__class__: haxe_ds_IntMap
 };
 var hxd_PixelFormat = $hxEnums["hxd.PixelFormat"] = { __ename__ : true, __constructs__ : ["ARGB","BGRA","RGBA","RGBA16F","RGBA32F","R8","R16F","R32F","RG8","RG16F","RG32F","RGB8","RGB16F","RGB32F","SRGB","SRGB_ALPHA","RGB10A2","RG11B10UF","S3TC"]
 	,ARGB: {_hx_index:0,__enum__:"hxd.PixelFormat",toString:$estr}
@@ -34072,9 +34294,6 @@ h3d_shader_VolumeDecal.prototype = $extend(hxsl_Shader.prototype,{
 	}
 	,__class__: h3d_shader_VolumeDecal
 });
-var haxe_IMap = function() { };
-$hxClasses["haxe.IMap"] = haxe_IMap;
-haxe_IMap.__name__ = "haxe.IMap";
 var haxe_EntryPoint = function() { };
 $hxClasses["haxe.EntryPoint"] = haxe_EntryPoint;
 haxe_EntryPoint.__name__ = "haxe.EntryPoint";
@@ -35472,35 +35691,6 @@ haxe_ds_EnumValueMap.prototype = $extend(haxe_ds_BalancedTree.prototype,{
 	}
 	,__class__: haxe_ds_EnumValueMap
 });
-var haxe_ds_IntMap = function() {
-	this.h = { };
-};
-$hxClasses["haxe.ds.IntMap"] = haxe_ds_IntMap;
-haxe_ds_IntMap.__name__ = "haxe.ds.IntMap";
-haxe_ds_IntMap.__interfaces__ = [haxe_IMap];
-haxe_ds_IntMap.prototype = {
-	remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) {
-			return false;
-		}
-		delete(this.h[key]);
-		return true;
-	}
-	,keys: function() {
-		var a = [];
-		for( var key in this.h ) this.h.hasOwnProperty(key) ? a.push(key | 0) : null;
-		return HxOverrides.iter(a);
-	}
-	,iterator: function() {
-		return { ref : this.h, it : this.keys(), hasNext : function() {
-			return this.it.hasNext();
-		}, next : function() {
-			var i = this.it.next();
-			return this.ref[i];
-		}};
-	}
-	,__class__: haxe_ds_IntMap
-};
 var haxe_ds_List = function() {
 	this.length = 0;
 };
@@ -35611,69 +35801,6 @@ haxe_ds__$StringMap_StringMapIterator.prototype = {
 		}
 	}
 	,__class__: haxe_ds__$StringMap_StringMapIterator
-};
-var haxe_ds_StringMap = function() {
-	this.h = { };
-};
-$hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
-haxe_ds_StringMap.__name__ = "haxe.ds.StringMap";
-haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
-haxe_ds_StringMap.prototype = {
-	setReserved: function(key,value) {
-		if(this.rh == null) {
-			this.rh = { };
-		}
-		this.rh["$" + key] = value;
-	}
-	,getReserved: function(key) {
-		if(this.rh == null) {
-			return null;
-		} else {
-			return this.rh["$" + key];
-		}
-	}
-	,existsReserved: function(key) {
-		if(this.rh == null) {
-			return false;
-		}
-		return this.rh.hasOwnProperty("$" + key);
-	}
-	,remove: function(key) {
-		if(__map_reserved[key] != null) {
-			key = "$" + key;
-			if(this.rh == null || !this.rh.hasOwnProperty(key)) {
-				return false;
-			}
-			delete(this.rh[key]);
-			return true;
-		} else {
-			if(!this.h.hasOwnProperty(key)) {
-				return false;
-			}
-			delete(this.h[key]);
-			return true;
-		}
-	}
-	,keys: function() {
-		return HxOverrides.iter(this.arrayKeys());
-	}
-	,arrayKeys: function() {
-		var out = [];
-		for( var key in this.h ) {
-		if(this.h.hasOwnProperty(key)) {
-			out.push(key);
-		}
-		}
-		if(this.rh != null) {
-			for( var key in this.rh ) {
-			if(key.charCodeAt(0) == 36) {
-				out.push(key.substr(1));
-			}
-			}
-		}
-		return out;
-	}
-	,__class__: haxe_ds_StringMap
 };
 var haxe_ds__$Vector_Vector_$Impl_$ = {};
 $hxClasses["haxe.ds._Vector.Vector_Impl_"] = haxe_ds__$Vector_Vector_$Impl_$;
@@ -57844,8 +57971,8 @@ var Float = Number;
 var Bool = Boolean;
 var Class = { };
 var Enum = { };
-haxe_ds_ObjectMap.count = 0;
 var __map_reserved = {};
+haxe_ds_ObjectMap.count = 0;
 Object.defineProperty(js__$Boot_HaxeError.prototype,"message",{ get : function() {
 	return String(this.val);
 }});
@@ -57871,7 +57998,15 @@ hx__registerFont = function(name,data) {
 if(ArrayBuffer.prototype.slice == null) {
 	ArrayBuffer.prototype.slice = js_html__$ArrayBuffer_ArrayBufferCompat.sliceImpl;
 }
+CardUtil.state = ECardsState.HIDDEN;
+CardUtil.active_cards = [];
 CardUtil.deck = [];
+Constants.CARD_W = 8;
+Constants.CARD_H = 12;
+Constants.CARD_R = 2;
+Constants.PADDING = 2;
+Constants.GRID_W = 16;
+Constants.GRID_H = 16;
 Xml.Element = 0;
 Xml.PCData = 1;
 Xml.CData = 2;
