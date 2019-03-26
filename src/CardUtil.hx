@@ -21,7 +21,6 @@ class CardUtil
 		for (card in spades) deck.push({ text:card.text, suit:'spades' });
 		for (card in clubs) deck.push({ text:card.text, suit:'clubs' });
 		for (card in special) deck.push({ text:card.text, suit:'special' });
-		trace(deck);
 	}
 
 	static function shuffle<T>(arr:Array<T>)
