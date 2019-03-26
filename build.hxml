@@ -1,5 +1,0 @@
--lib heaps
--js bin/app.js
--cp src
--main Main
--debug
