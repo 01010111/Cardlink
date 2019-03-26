@@ -6,6 +6,8 @@ using Math;
 class CardUtil
 {
 
+	public static var state:ECardsState = HIDDEN;
+	public static var active_cards:Array<Card> = [];
 	static var deck:Array<CardData> = [];
 
 	public static function populate_deck()
@@ -22,6 +24,9 @@ class CardUtil
 		for (card in clubs) deck.push({ text:card.text, suit:'clubs' });
 		for (card in special) deck.push({ text:card.text, suit:'special' });
 	}
+
+	public static function add(card:Card) active_cards.push(card);
+	public static function remove(card:Card) active_cards.remove(card);
 
 	static function shuffle<T>(arr:Array<T>)
 	{
@@ -48,4 +53,22 @@ class CardUtil
 		deck.push(card.get_data());
 	}
 
+	public static function reveal()
+	{
+		for (card in active_cards) card.reveal();
+		state = REVEALED;
+	}
+
+	public static function hide()
+	{
+		for (card in active_cards) card.hide();
+		state = HIDDEN;
+	}
+
+}
+
+enum ECardsState
+{
+	REVEALED;
+	HIDDEN;
 }

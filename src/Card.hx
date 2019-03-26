@@ -1,8 +1,11 @@
+import hxd.Event;
 import h2d.Interactive;
 import hxd.res.DefaultFont;
 import h2d.Text;
 import h2d.Object;
 import h2d.Graphics;
+
+using Math;
 
 class Card extends Graphics
 {
@@ -14,6 +17,7 @@ class Card extends Graphics
 	var front:Object;
 	var back:Object;
 	var text:Text;
+	var int:Interactive;
 
 	var card_data(default, set):CardData;
 	function set_card_data(data:CardData):CardData
@@ -29,9 +33,9 @@ class Card extends Graphics
 	{
 		super(parent);
 		beginFill(0x000000);
-		drawRoundedRect(PADDING - 1, PADDING - 1, CARD_W - PADDING * 2 + 2, CARD_H - PADDING * 2 + 2, CARD_R);
+		drawRoundedRect(PADDING - 1, PADDING - 1, (CARD_W * GRID_W) - PADDING * 2 + 2, (CARD_H * GRID_H) - PADDING * 2 + 2, CARD_R);
 		beginFill(0xFFFFFF);
-		drawRoundedRect(PADDING, PADDING, CARD_W - PADDING * 2, CARD_H - PADDING * 2, CARD_R);
+		drawRoundedRect(PADDING, PADDING, (CARD_W * GRID_W) - PADDING * 2, (CARD_H * GRID_H) - PADDING * 2, CARD_R);
 		endFill();
 		setPosition(x, y);
 
@@ -41,39 +45,46 @@ class Card extends Graphics
 		text = new Text(DefaultFont.get(), front);
 		text.color.set();
 		text.textAlign = Align.Center;
-		text.setPosition(CARD_W * 0.5, CARD_H * 0.5 - 8);
+		text.setPosition((CARD_W * GRID_W) * 0.5, (CARD_H * GRID_H) * 0.5 - 8);
 
 		var b = new Graphics(back);
 		b.beginFill(0x000000);
-		b.drawRoundedRect(PADDING * 2, PADDING * 2, CARD_W - PADDING * 4, CARD_H - PADDING * 4, CARD_R);
+		b.drawRoundedRect(PADDING * 2, PADDING * 2, (CARD_W * GRID_W) - PADDING * 4, (CARD_H * GRID_H) - PADDING * 4, CARD_R);
 		b.endFill();
 
-		hide();
-
-		var int = new Interactive(CARD_W, CARD_H, this);
-		int.onClick = click;
+		int = new Interactive((CARD_W * GRID_W), (CARD_H * GRID_H), this);
+		int.onPush = click;
 		int.onRelease = release;
-		int.onMove = drag;
+
+		switch (CardUtil.state) {
+			case REVEALED: reveal();
+			case HIDDEN: hide();
+		}
+		CardUtil.add(this);
 	}
 
-	function click(e)
+	function click(e:Event)
 	{
 		var p = parent;
 		p.remove();
 		p.addChild(this);
-		held = true;
+		int.startDrag(drag);
+		offset = {x:e.relX, y:e.relY};
 		//flipped ? hide() : reveal();
 	}
 
-	function release(e)
+	function drag(e:Event)
 	{
-		held = false;
+		x += e.relX - offset.x;
+		y += e.relY - offset.y;
 	}
 
-	function drag(e)
+	function release(e:Event)
 	{
-		if (!held) return;
-		x = 
+		int.stopDrag();
+		x = GRID_W * (x / GRID_W).round();
+		y = GRID_H * (y / GRID_H).round();
+		if (x == GRID_W && y == GRID_H) destroy();
 	}
 
 	public function reveal()
@@ -90,6 +101,13 @@ class Card extends Graphics
 		back.alpha = 1;
 		front.alpha = 0;
 		flipped = false;
+	}
+
+	function destroy()
+	{
+		CardUtil.remove(this);
+		CardUtil.return_data(this);
+		parent.removeChild(this);
 	}
 
 }
