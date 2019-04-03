@@ -30,7 +30,7 @@ class FlipBtn extends Graphics
 		int.onClick = click;
 	}
 
-	function click(e:Event)
+	public function click(?e:Event)
 	{
 		flipped ? {
 			CardUtil.hide();
