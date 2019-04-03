@@ -1,6 +1,7 @@
 class Constants
 {
 
+	public static var VERSION:String = '0.1.0';
 	public static var CARD_W:Float = 8;
 	public static var CARD_H:Float = 12;
 	public static var CARD_R:Float = 2;

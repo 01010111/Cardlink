@@ -19,6 +19,7 @@ class Main extends hxd.App
 		grid = new Grid(s2d, 0xFFFFFF, 0.25);
 		pile = new DiscardPile(s2d);
 		flip = new FlipBtn(s2d);
+		new Version(s2d);
     }
 
 	override public function update(dt)
