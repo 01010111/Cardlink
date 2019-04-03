@@ -22,6 +22,7 @@ class Main extends hxd.App
 		flip = new FlipBtn(s2d);
 		CardUtil.cards = new Object(s2d);
 		new Version(s2d);
+		URLHandler.check_url();
     }
 
 	override public function update(dt)
@@ -29,6 +30,7 @@ class Main extends hxd.App
 		super.update(dt);
 		if (any_key_pressed([Key.SPACE, Key.ENTER])) flip.click();
 		if (any_key_pressed([Key.DELETE, Key.BACKSPACE])) CardUtil.destroy_all();
+		if (any_key_pressed([Key.U])) trace(URLHandler.get_url());
 	}
 
 	function any_key_pressed(keys:Array<Int>)
@@ -37,6 +39,9 @@ class Main extends hxd.App
 		return false;
 	}
 
-	public function add_card(x:Float, y:Float) new Card(x, y);
+	public function add_card(x:Float, y:Float):Card return new Card(x, y);
 
 }
+/*
++10-7-3-heavy
+*/

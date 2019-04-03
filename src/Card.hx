@@ -26,6 +26,8 @@ class Card extends Graphics
 	var card_data(default, set):CardData;
 	function set_card_data(data:CardData):CardData
 	{
+		if (card_data != null) CardUtil.return_data(this);
+
 		text.text = data.text;
 
 		switch (data.suit) {
@@ -53,6 +55,8 @@ class Card extends Graphics
 
 		return card_data = data;
 	}
+
+	public var locked:Bool = false;
 
 	public function set_data(data:CardData) card_data = data;
 	public function get_data():CardData return card_data;
@@ -107,6 +111,7 @@ class Card extends Graphics
 		}
 		
 		CardUtil.add(this);
+		CardUtil.get_data(this);
 	}
 
 	function click(e:Event)
@@ -138,7 +143,7 @@ class Card extends Graphics
 
 	public function flip(show:Bool)
 	{
-		show ? CardUtil.get_data(this) : CardUtil.return_data(this);
+		if (!locked) show ? CardUtil.get_data(this) : CardUtil.return_data(this);
 		Actuate.tween(this, FLIP_TIME/2, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
 			front.alpha = show ? 1 : 0;
 			back.alpha = show ? 0 : 1;
