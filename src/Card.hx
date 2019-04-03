@@ -57,9 +57,9 @@ class Card extends Graphics
 	public function set_data(data:CardData) card_data = data;
 	public function get_data():CardData return card_data;
 
-	public function new(parent:h2d.Object, x:Float, y:Float)
+	public function new(x:Float, y:Float)
 	{
-		super(parent);
+		super(CardUtil.cards);
 		beginFill(0x000000);
 		drawRoundedRect(PADDING - 1, PADDING - 1, (CARD_W * GRID_W) - PADDING * 2 + 2, (CARD_H * GRID_H) - PADDING * 2 + 2, CARD_R);
 		beginFill(0xFFFFFF);
@@ -105,15 +105,20 @@ class Card extends Graphics
 			case REVEALED: reveal();
 			case HIDDEN: hide();
 		}
+		
 		CardUtil.add(this);
 	}
 
 	function click(e:Event)
 	{
-		var p = parent;
-		p.children.push(p.children.splice(p.children.indexOf(this), 1)[0]);
+		bring_to_front();
 		int.startDrag(drag);
 		offset = {x:e.relX, y:e.relY};
+	}
+
+	public function bring_to_front()
+	{
+		parent.children.push(parent.children.splice(parent.children.indexOf(this), 1)[0]);
 	}
 
 	function drag(e:Event)
@@ -128,25 +133,17 @@ class Card extends Graphics
 		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == GRID_W && y == GRID_H) destroy());
 	}
 
-	public function reveal()
-	{
-		Actuate.tween(this, 0.1, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
-			CardUtil.get_data(this);
-			front.alpha = 1;
-			back.alpha = 0;
-			flipped = true;
-			Actuate.tween(this, 0.1, { scaleX: 1, x: x - CARD_W * GRID_W * 0.5 });
-		});
-	}
+	public function reveal() flip(true);
+	public function hide() flip(false);
 
-	public function hide()
+	public function flip(show:Bool)
 	{
-		Actuate.tween(this, 0.1, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
-			CardUtil.return_data(this);
-			front.alpha = 0;
-			back.alpha = 1;
-			flipped = false;
-			Actuate.tween(this, 0.1, { scaleX: 1, x: x - CARD_W * GRID_W * 0.5 });
+		show ? CardUtil.get_data(this) : CardUtil.return_data(this);
+		Actuate.tween(this, FLIP_TIME/2, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
+			front.alpha = show ? 1 : 0;
+			back.alpha = show ? 0 : 1;
+			flipped = show;
+			Actuate.tween(this, FLIP_TIME/2, { scaleX: 1, x: x - CARD_W * GRID_W * 0.5 });
 		});
 	}
 

@@ -1,3 +1,4 @@
+import motion.Actuate;
 import hxd.Event;
 import h2d.Interactive;
 import hxd.res.DefaultFont;
@@ -10,6 +11,7 @@ class FlipBtn extends Graphics
 	var text:Text;
 	var int:Interactive;
 	var flipped:Bool = false;
+	var can_flip:Bool = true;
 
 	public function new(parent:h2d.Object)
 	{
@@ -32,6 +34,13 @@ class FlipBtn extends Graphics
 
 	public function click(?e:Event)
 	{
+		if (!can_flip) return;
+		can_flip = false;
+		alpha = 0.5;
+		Actuate.timer(FLIP_TIME).onComplete(() -> {
+			can_flip = true;
+			alpha = 1;
+		});
 		flipped ? {
 			CardUtil.hide();
 			text.text = 'REVEAL';

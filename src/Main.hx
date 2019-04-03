@@ -1,3 +1,4 @@
+import h2d.Object;
 import hxd.Key;
 
 class Main extends hxd.App
@@ -19,6 +20,7 @@ class Main extends hxd.App
 		grid = new Grid(s2d, 0xFFFFFF, 0.25);
 		pile = new DiscardPile(s2d);
 		flip = new FlipBtn(s2d);
+		CardUtil.cards = new Object(s2d);
 		new Version(s2d);
     }
 
@@ -29,6 +31,6 @@ class Main extends hxd.App
 		if (Key.isPressed(Key.D)) CardUtil.destroy_all();
 	}
 
-	public function add_card(x:Float, y:Float) new Card(s2d, x, y);
+	public function add_card(x:Float, y:Float) new Card(x, y);
 
 }

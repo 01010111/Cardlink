@@ -16,7 +16,7 @@ class Grid extends Graphics
 			drawCircle(i * GRID_W, j * GRID_H, 1);
 			var int = new Interactive(GRID_W, GRID_H, this);
 			int.setPosition(i * GRID_W, j * GRID_H);
-			int.onPush = (e) -> if (CardUtil.active_cards.length < CardUtil.num_cards) Main.i.add_card(i * GRID_W, j * GRID_H);
+			int.onPush = (e) -> if (CardUtil.cards.children.length < CardUtil.num_cards) Main.i.add_card(i * GRID_W, j * GRID_H);
 		}
 		endFill();
 	}

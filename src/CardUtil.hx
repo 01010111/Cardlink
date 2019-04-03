@@ -1,3 +1,4 @@
+import h2d.Object;
 import motion.Actuate;
 import haxe.Json;
 import Card.CardData;
@@ -9,6 +10,7 @@ class CardUtil
 
 	public static var state:ECardsState = HIDDEN;
 	public static var active_cards:Array<Card> = [];
+	public static var cards:Object;
 	public static var deck:Array<CardData> = [];
 	public static var num_cards:Int = 0;
 
@@ -76,7 +78,9 @@ class CardUtil
 	public static function destroy_all()
 	{
 		var i = 0;
-		for (card in active_cards) Actuate.timer(i++ * 0.1).onComplete(() -> {
+		for (card in cards) Actuate.timer((cards.numChildren -  i++) * 0.1).onComplete(() -> {
+			var card:Card = cast card;
+			card.bring_to_front();
 			Actuate.tween(card, 0.2, { x: GRID_W, y: GRID_H }).onComplete(() -> card.destroy());
 		});
 	}
