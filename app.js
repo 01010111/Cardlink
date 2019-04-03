@@ -2716,6 +2716,7 @@ h2d_Graphics.prototype = $extend(h2d_Drawable.prototype,{
 	,__class__: h2d_Graphics
 });
 var Card = function(x,y) {
+	this.locked = false;
 	this.held = false;
 	h2d_Graphics.call(this,CardUtil.cards);
 	this.beginFill(0);
@@ -2775,12 +2776,16 @@ var Card = function(x,y) {
 		break;
 	}
 	CardUtil.add(this);
+	CardUtil.get_data(this);
 };
 $hxClasses["Card"] = Card;
 Card.__name__ = "Card";
 Card.__super__ = h2d_Graphics;
 Card.prototype = $extend(h2d_Graphics.prototype,{
 	set_card_data: function(data) {
+		if(this.card_data != null) {
+			CardUtil.return_data(this);
+		}
 		this.text.set_text(data.text);
 		switch(data.suit) {
 		case "clubs":
@@ -2890,10 +2895,12 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 	}
 	,flip: function(show) {
 		var _gthis = this;
-		if(show) {
-			CardUtil.get_data(this);
-		} else {
-			CardUtil.return_data(this);
+		if(!this.locked) {
+			if(show) {
+				CardUtil.get_data(this);
+			} else {
+				CardUtil.return_data(this);
+			}
 		}
 		motion_Actuate.tween(this,Constants.FLIP_TIME / 2,{ scaleX : 0, x : this.x + Constants.CARD_W * Constants.GRID_W * 0.5}).onComplete(function() {
 			_gthis.front.alpha = show ? 1 : 0;
@@ -3438,6 +3445,7 @@ Main.prototype = $extend(hxd_App.prototype,{
 		this.flip = new FlipBtn(this.s2d);
 		CardUtil.cards = new h2d_Object(this.s2d);
 		new Version(this.s2d);
+		URLHandler.check_url();
 	}
 	,update: function(dt) {
 		hxd_App.prototype.update.call(this,dt);
@@ -3446,6 +3454,9 @@ Main.prototype = $extend(hxd_App.prototype,{
 		}
 		if(this.any_key_pressed([46,8])) {
 			CardUtil.destroy_all();
+		}
+		if(this.any_key_pressed([85])) {
+			haxe_Log.trace(URLHandler.get_url(),{ fileName : "src/Main.hx", lineNumber : 33, className : "Main", methodName : "update"});
 		}
 	}
 	,any_key_pressed: function(keys) {
@@ -3460,7 +3471,7 @@ Main.prototype = $extend(hxd_App.prototype,{
 		return false;
 	}
 	,add_card: function(x,y) {
-		new Card(x,y);
+		return new Card(x,y);
 	}
 	,__class__: Main
 });
@@ -3763,6 +3774,79 @@ Type.enumParameters = function(e) {
 	} else {
 		return [];
 	}
+};
+var URLHandler = function() { };
+$hxClasses["URLHandler"] = URLHandler;
+URLHandler.__name__ = "URLHandler";
+URLHandler.check_url = function() {
+	var url = window.location.href;
+	haxe_Log.trace("URL:",{ fileName : "src/URLHandler.hx", lineNumber : 9, className : "URLHandler", methodName : "check_url", customParams : [url]});
+	var split_url = url.split("?");
+	if(split_url.length != 2) {
+		return;
+	}
+	haxe_Log.trace("Dynamic:",{ fileName : "src/URLHandler.hx", lineNumber : 12, className : "URLHandler", methodName : "check_url", customParams : [split_url[1]]});
+	var cards_data = split_url[1].split("+");
+	var _g = 0;
+	while(_g < cards_data.length) {
+		var data = cards_data[_g];
+		++_g;
+		if(!URLHandler.validate_card(data)) {
+			return;
+		}
+	}
+	var _g1 = 0;
+	while(_g1 < cards_data.length) {
+		var data1 = cards_data[_g1];
+		++_g1;
+		if(data1.length > 0) {
+			URLHandler.add_card(data1.split("-"));
+		}
+	}
+};
+URLHandler.validate_card = function(card) {
+	if(card.length == 0) {
+		return true;
+	}
+	var data = card.split("-");
+	if(data.length != 4) {
+		return false;
+	}
+	if(isNaN(Std.parseInt(data[0]))) {
+		return false;
+	}
+	if(isNaN(Std.parseInt(data[1]))) {
+		return false;
+	}
+	if(isNaN(Std.parseInt(data[2]))) {
+		return false;
+	}
+	if(Std.parseInt(data[3]) < 0 || Std.parseInt(data[3]) > 4) {
+		return false;
+	}
+	return true;
+};
+URLHandler.add_card = function(data) {
+	var x = Std.parseInt(data[0]) * Constants.GRID_W;
+	var y = Std.parseInt(data[1]) * Constants.GRID_H;
+	var suit = Std.parseInt(data[2]);
+	var text = data[3];
+	var card = new Card(x,y);
+	card.set_data({ text : text, suit : ["hearts","diamonds","spades","clubs","special"][suit]});
+	card.locked = true;
+};
+URLHandler.get_url = function() {
+	var url = "http://01010111.com/Cardlink/?";
+	var _g_i = 0;
+	var _g_a = CardUtil.cards.children;
+	var _g_l = _g_a.length;
+	while(_g_i < _g_l) {
+		var card = _g_a[_g_i++];
+		var card1 = card;
+		var data = card1.get_data();
+		url += "+" + Math.round(card1.x / Constants.GRID_W) + "-" + Math.round(card1.y / Constants.GRID_H) + "-" + ["hearts","diamonds","spades","clubs","special"].indexOf(data.suit) + "-" + data.text;
+	}
+	return url;
 };
 var h2d_Text = function(font,parent) {
 	this.realMaxWidth = -1;
@@ -53011,6 +53095,9 @@ hxsl_Eval.prototype = {
 					d = hxsl_TExprDef.TBinop(op,e12,e22);
 				}
 				break;
+			case 4:case 20:case 21:
+				d = hxsl_TExprDef.TBinop(op,e12,e22);
+				break;
 			case 5:
 				var _g6 = e22.e;
 				var _g16 = e12.e;
@@ -53654,9 +53741,6 @@ hxsl_Eval.prototype = {
 				} else {
 					d = hxsl_TExprDef.TBinop(op,e12,e22);
 				}
-				break;
-			case 4:case 20:case 21:
-				d = hxsl_TExprDef.TBinop(op,e12,e22);
 				break;
 			case 22:
 				throw new js__$Boot_HaxeError("assert");
@@ -59670,7 +59754,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.deck = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.1.3";
+Constants.VERSION = "0.1.4";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
