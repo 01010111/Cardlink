@@ -1,3 +1,4 @@
+import motion.Actuate;
 import haxe.Json;
 import Card.CardData;
 
@@ -8,7 +9,8 @@ class CardUtil
 
 	public static var state:ECardsState = HIDDEN;
 	public static var active_cards:Array<Card> = [];
-	static var deck:Array<CardData> = [];
+	public static var deck:Array<CardData> = [];
+	public static var num_cards:Int = 0;
 
 	public static function populate_deck()
 	{
@@ -18,11 +20,17 @@ class CardUtil
 		var spades:Array<{text:String}> = deck_data.spades;
 		var clubs:Array<{text:String}> = deck_data.clubs;
 		var special:Array<{text:String}> = deck_data.special;
-		for (card in diamonds) deck.push({ text:card.text, suit:'diamonds' });
-		for (card in hearts) deck.push({ text:card.text, suit:'hearts' });
-		for (card in spades) deck.push({ text:card.text, suit:'spades' });
-		for (card in clubs) deck.push({ text:card.text, suit:'clubs' });
-		for (card in special) deck.push({ text:card.text, suit:'special' });
+		for (card in diamonds) add_data({ text:card.text, suit:'diamonds' });
+		for (card in hearts) add_data({ text:card.text, suit:'hearts' });
+		for (card in spades) add_data({ text:card.text, suit:'spades' });
+		for (card in clubs) add_data({ text:card.text, suit:'clubs' });
+		for (card in special) add_data({ text:card.text, suit:'special' });
+	}
+
+	static function add_data(data:CardData)
+	{
+		num_cards++;
+		deck.push(data);
 	}
 
 	public static function add(card:Card) active_cards.push(card);
@@ -63,6 +71,14 @@ class CardUtil
 	{
 		for (card in active_cards) card.hide();
 		state = HIDDEN;
+	}
+
+	public static function destroy_all()
+	{
+		var i = 0;
+		for (card in active_cards) Actuate.timer(i++ * 0.1).onComplete(() -> {
+			Actuate.tween(card, 0.2, { x: GRID_W, y: GRID_H }).onComplete(() -> card.destroy());
+		});
 	}
 
 }
