@@ -52,6 +52,11 @@ class Card extends Graphics
 		b.drawRoundedRect(PADDING * 2, PADDING * 2, (CARD_W * GRID_W) - PADDING * 4, (CARD_H * GRID_H) - PADDING * 4, CARD_R);
 		b.endFill();
 
+		/*var logo = new Bitmap(hxd.Res.logo.toTile().center(), back);
+		logo.setPosition(CARD_W * GRID_W * 0.5, CARD_H * GRID_H * 0.5);
+		logo.setScale(0.25);
+		logo.smooth = true;*/
+
 		int = new Interactive((CARD_W * GRID_W), (CARD_H * GRID_H), this);
 		int.onPush = click;
 		int.onRelease = release;

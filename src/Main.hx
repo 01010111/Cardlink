@@ -8,6 +8,7 @@ class Main extends hxd.App
     override function init()
 	{
 		i = this;
+		//hxd.Res.initEmbed();
 		CardUtil.populate_deck();
 		new Grid(s2d, 0xFFFFFF, 0.25);
 		new DiscardPile(s2d);
