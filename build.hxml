@@ -1,5 +1,7 @@
 -lib heaps
+-lib actuate
 -js bin/app.js
 -cp src
 -main Main
 -debug
+-D html5

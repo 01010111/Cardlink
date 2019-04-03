@@ -1,3 +1,5 @@
+import h2d.Bitmap;
+import motion.Actuate;
 import hxd.Event;
 import h2d.Interactive;
 import hxd.res.DefaultFont;
@@ -95,6 +97,10 @@ class Card extends Graphics
 		int.onPush = click;
 		int.onRelease = release;
 
+		scaleX = 0;
+		front.alpha = 0;
+		back.alpha = 0;
+
 		switch (CardUtil.state) {
 			case REVEALED: reveal();
 			case HIDDEN: hide();
@@ -105,11 +111,9 @@ class Card extends Graphics
 	function click(e:Event)
 	{
 		var p = parent;
-		p.remove();
-		p.addChild(this);
+		p.children.push(p.children.splice(p.children.indexOf(this), 1)[0]);
 		int.startDrag(drag);
 		offset = {x:e.relX, y:e.relY};
-		//flipped ? hide() : reveal();
 	}
 
 	function drag(e:Event)
@@ -128,25 +132,33 @@ class Card extends Graphics
 
 	public function reveal()
 	{
-		CardUtil.get_data(this);
-		back.alpha = 0;
-		front.alpha = 1;
-		flipped = true;
+		Actuate.tween(this, 0.1, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
+			CardUtil.get_data(this);
+			front.alpha = 1;
+			back.alpha = 0;
+			flipped = true;
+			Actuate.tween(this, 0.1, { scaleX: 1, x: x - CARD_W * GRID_W * 0.5 });
+		});
 	}
 
 	public function hide()
 	{
-		CardUtil.return_data(this);
-		back.alpha = 1;
-		front.alpha = 0;
-		flipped = false;
+		Actuate.tween(this, 0.1, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
+			CardUtil.return_data(this);
+			front.alpha = 0;
+			back.alpha = 1;
+			flipped = false;
+			Actuate.tween(this, 0.1, { scaleX: 1, x: x - CARD_W * GRID_W * 0.5 });
+		});
 	}
 
-	function destroy()
+	public function destroy()
 	{
-		CardUtil.remove(this);
-		CardUtil.return_data(this);
-		parent.removeChild(this);
+		Actuate.tween(this, 0.2, { scaleX: 0, scaleY: 0, x: x + CARD_W * GRID_W * 0.5, y: y + CARD_H * GRID_H * 0.5 }).onComplete(() -> {
+			CardUtil.remove(this);
+			CardUtil.return_data(this);
+			parent.removeChild(this);
+		});
 	}
 
 }
