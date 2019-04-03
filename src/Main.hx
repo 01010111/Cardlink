@@ -27,8 +27,14 @@ class Main extends hxd.App
 	override public function update(dt)
 	{
 		super.update(dt);
-		if (Key.isPressed(Key.R)) flip.click();
-		if (Key.isPressed(Key.D)) CardUtil.destroy_all();
+		if (any_key_pressed([Key.SPACE, Key.ENTER])) flip.click();
+		if (any_key_pressed([Key.DELETE, Key.BACKSPACE])) CardUtil.destroy_all();
+	}
+
+	function any_key_pressed(keys:Array<Int>)
+	{
+		for (key in keys) if (Key.isPressed(key)) return true;
+		return false;
 	}
 
 	public function add_card(x:Float, y:Float) new Card(x, y);
