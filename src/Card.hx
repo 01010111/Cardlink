@@ -17,12 +17,38 @@ class Card extends Graphics
 	var front:Object;
 	var back:Object;
 	var text:Text;
+	var suit_top:Text;
+	var suit_bottom:Text;
 	var int:Interactive;
 
 	var card_data(default, set):CardData;
 	function set_card_data(data:CardData):CardData
 	{
 		text.text = data.text;
+
+		switch (data.suit) {
+			case 'hearts':
+				suit_top.color.set(1, 0, 0.2);
+				suit_bottom.color.set(1, 0, 0.2);
+				suit_top.text = suit_bottom.text = 'H';
+			case 'diamonds':
+				suit_top.color.set(1, 0, 0.2);
+				suit_bottom.color.set(1, 0, 0.2);
+				suit_top.text = suit_bottom.text = 'D';
+			case 'spades':
+				suit_top.color.set();
+				suit_bottom.color.set();
+				suit_top.text = suit_bottom.text = 'S';
+			case 'clubs':
+				suit_top.color.set();
+				suit_bottom.color.set();
+				suit_top.text = suit_bottom.text = 'C';
+			default:
+				suit_top.color.set(1, 0, 0.2);
+				suit_bottom.color.set(1, 0, 0.2);
+				suit_top.text = suit_bottom.text = '*';
+		}
+
 		return card_data = data;
 	}
 
@@ -46,6 +72,14 @@ class Card extends Graphics
 		text.color.set();
 		text.textAlign = Align.Center;
 		text.setPosition((CARD_W * GRID_W) * 0.5, (CARD_H * GRID_H) * 0.5 - 8);
+
+		suit_top = new Text(DefaultFont.get(), front);
+		suit_top.textAlign = Align.Center;
+		suit_top.setPosition(PADDING + 16, PADDING + 16 - 8);
+
+		suit_bottom = new Text(DefaultFont.get(), front);
+		suit_bottom.textAlign = Align.Center;
+		suit_bottom.setPosition((CARD_W * GRID_W) - PADDING - 16, (CARD_H * GRID_W) - PADDING - 16 - 8);
 
 		var b = new Graphics(back);
 		b.beginFill(0x000000);
