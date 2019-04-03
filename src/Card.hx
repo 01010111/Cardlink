@@ -125,9 +125,7 @@ class Card extends Graphics
 	function release(e:Event)
 	{
 		int.stopDrag();
-		x = GRID_W * (x / GRID_W).round();
-		y = GRID_H * (y / GRID_H).round();
-		if (x == GRID_W && y == GRID_H) destroy();
+		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == GRID_W && y == GRID_H) destroy());
 	}
 
 	public function reveal()
