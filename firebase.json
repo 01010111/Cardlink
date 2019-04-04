@@ -1,13 +1,7 @@
 "hosting": {
   "appAssociation": "AUTO",
   "rewrites": [
-    {
-      "source": "/promos/**",
-      "dynamicLinks": true
-    },
-    {
-      "source": "/links/share/**",
-      "dynamicLinks": true
-    }
+    { "source": "/Cardlink/**", "dynamicLinks": true },
+    { "source": "/cl/**", "dynamicLinks": true },
   ]
 }
