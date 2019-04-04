@@ -1,5 +1,7 @@
 using Math;
+using StringTools;
 
+@:expose
 class URLHandler
 {
 
@@ -10,15 +12,15 @@ class URLHandler
 		var split_url = url.split('?');
 		if (split_url.length != 2) return;
 		trace('Dynamic:', split_url[1]);
-		var cards_data = split_url[1].split('+');
+		var cards_data = split_url[1].urlDecode().split('+');
 		for (data in cards_data) if (!validate_card(data)) return;
-		for (data in cards_data) if (data.length > 0) add_card(data.split('-'));
+		for (data in cards_data) if (data.length > 0) add_card(data.split('/'));
 	}
 
 	static function validate_card(card:String):Bool
 	{
 		if (card.length == 0) return true;
-		var data = card.split('-');
+		var data = card.split('/');
 		if (data.length != 4) return false;
 		for (i in 0...3) if (Math.isNaN(Std.parseInt(data[i]))) return false;
 		if (Std.parseInt(data[3]) < 0 || Std.parseInt(data[3]) > 4) return false;
@@ -39,13 +41,14 @@ class URLHandler
 	public static function get_url():String
 	{
 		var url = 'http://01010111.com/Cardlink/?';
+		var str = '';
 		for (card in CardUtil.cards)
 		{
 			var card:Card = cast card;
 			var data = card.get_data();
-			url += '+${(card.x / GRID_W).round()}-${(card.y / GRID_H).round()}-${['hearts', 'diamonds', 'spades', 'clubs', 'special'].indexOf(data.suit)}-${data.text}';
+			str += '+${(card.x / GRID_W).round()}/${(card.y / GRID_H).round()}/${['hearts', 'diamonds', 'spades', 'clubs', 'special'].indexOf(data.suit)}/${data.text}';
 		}
-		return url;
+		return url += str.urlEncode();
 	}
 
 }
