@@ -1,0 +1,7 @@
+"hosting": {
+  "appAssociation": "AUTO",
+  "rewrites": [
+    { "source": "/Cardlink/**", "dynamicLinks": true },
+    { "source": "/cl/**", "dynamicLinks": true },
+  ]
+}
