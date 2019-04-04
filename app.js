@@ -3439,6 +3439,7 @@ Main.__super__ = hxd_App;
 Main.prototype = $extend(hxd_App.prototype,{
 	init: function() {
 		Main.i = this;
+		this.s2d.setFixedSize(window.innerWidth,window.innerHeight);
 		CardUtil.populate_deck();
 		this.grid = new Grid(this.s2d,16777215,0.25);
 		this.pile = new DiscardPile(this.s2d);
@@ -3456,7 +3457,7 @@ Main.prototype = $extend(hxd_App.prototype,{
 			CardUtil.destroy_all();
 		}
 		if(this.any_key_pressed([85])) {
-			haxe_Log.trace(URLHandler.get_url(),{ fileName : "src/Main.hx", lineNumber : 33, className : "Main", methodName : "update"});
+			haxe_Log.trace(URLHandler.get_url(),{ fileName : "src/Main.hx", lineNumber : 35, className : "Main", methodName : "update"});
 		}
 	}
 	,any_key_pressed: function(keys) {
@@ -59754,7 +59755,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.deck = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.1.5";
+Constants.VERSION = "0.1.6";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
