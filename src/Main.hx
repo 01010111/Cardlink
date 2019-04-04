@@ -1,3 +1,4 @@
+import js.Browser;
 import h2d.Object;
 import hxd.Key;
 
@@ -15,6 +16,7 @@ class Main extends hxd.App
     override function init()
 	{
 		i = this;
+		s2d.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
 		//hxd.Res.initEmbed();
 		CardUtil.populate_deck();
 		grid = new Grid(s2d, 0xFFFFFF, 0.25);
