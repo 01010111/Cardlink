@@ -39,7 +39,7 @@ class HttpUtil
 		var text = data[3];
 		var card = new Card(x, y);
 		card.set_data({ text: text, suit: suits[suit] });
-		card.locked = true;
+		card.lock();
 	}
 
 	public static function get_url():String

@@ -13,6 +13,7 @@ class Card extends Graphics
 {
 
 	var held:Bool = false;
+	var locked:Bool = false;
 	var flipped:Bool;
 	var offset:{x:Float,y:Float};
 
@@ -55,8 +56,6 @@ class Card extends Graphics
 
 		return card_data = data;
 	}
-
-	public var locked:Bool = false;
 
 	public function set_data(data:CardData) card_data = data;
 	public function get_data():CardData return card_data;
@@ -114,11 +113,37 @@ class Card extends Graphics
 		CardUtil.get_data(this);
 	}
 
+	var last:{x:Float, y:Float} = { x:0, y:0 };
+
 	function click(e:Event)
 	{
 		bring_to_front();
 		int.startDrag(drag);
 		offset = {x:e.relX, y:e.relY};
+		held = true;
+		last.x = x;
+		last.y = y;
+		Actuate.timer(1).onComplete(() -> check_lock());
+	}
+
+	function check_lock()
+	{
+		if (!held) return;
+		if (Math.abs(last.x - x) > GRID_W) return;
+		if (Math.abs(last.y - y) > GRID_H) return;
+		locked ? unlock() : lock();
+	}
+
+	public function lock()
+	{
+		locked = true;
+		text.color.set(1);
+	}
+
+	public function unlock()
+	{
+		locked = false;
+		text.color.set();
 	}
 
 	public function bring_to_front()
@@ -135,6 +160,7 @@ class Card extends Graphics
 	function release(e:Event)
 	{
 		int.stopDrag();
+		held = false;
 		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == GRID_W && y == GRID_H) destroy());
 	}
 
