@@ -16,6 +16,7 @@ class FlipBtn extends Graphics
 	public function new(parent:h2d.Object)
 	{
 		super(parent);
+		Main.i.flip = this;
 		lineStyle(1, 0xFFFFFF);
 		beginFill(0x000000);
 		drawRect(PADDING * 2, PADDING * 2, (CARD_W * GRID_W) - PADDING * 4, GRID_H * 2 - PADDING * 4);

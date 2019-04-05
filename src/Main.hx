@@ -9,21 +9,20 @@ class Main extends hxd.App
 
 	public static var i:Main;
 
-	var grid:Grid;
-	var pile:DiscardPile;
-	var flip:FlipBtn;
+	public var flip:FlipBtn;
 
     override function init()
 	{
+		//hxd.Res.initEmbed();
 		i = this;
 		s2d.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
-		//hxd.Res.initEmbed();
 		CardUtil.populate_deck();
-		grid = new Grid(s2d, 0xFFFFFF, 0.25);
-		pile = new DiscardPile(s2d);
-		flip = new FlipBtn(s2d);
-		CardUtil.cards = new Object(s2d);
+		new Grid(s2d, 0xFFFFFF, 0.25);
+		new DiscardPile(s2d);
+		new FlipBtn(s2d);
 		new Version(s2d);
+		new ShareBtn(s2d);
+		CardUtil.cards = new Object(s2d);
 		URLHandler.check_url();
     }
 
