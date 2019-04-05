@@ -3620,8 +3620,11 @@ MathUtil.degrees_to_radians = function(angle) {
 var PopUp = function(s) {
 	var _gthis = this;
 	h2d_Graphics.call(this,Main.i.scene);
-	this.beginFill(0,0.5);
+	this.beginFill(0,0.66);
 	this.drawRect(0,0,Main.i.scene.width,Main.i.scene.height);
+	this.endFill();
+	this.beginFill(0);
+	this.drawRect(0,Main.i.scene.height / 2 - 32,Main.i.scene.width,64);
 	this.endFill();
 	var text = new h2d_Text(hxd_res_DefaultFont.get(),this);
 	text.posChanged = true;
@@ -59940,7 +59943,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.deck = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.2.1";
+Constants.VERSION = "0.2.2";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
