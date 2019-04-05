@@ -1,9 +1,10 @@
-import haxe.Json;
+import js.Browser;
+using haxe.Json;
 using Math;
 using StringTools;
 
 @:expose
-class URLHandler
+class HttpUtil
 {
 
 	static var card_separator:String = '+';
@@ -54,10 +55,10 @@ class URLHandler
 		return url += str.urlEncode();
 	}
 
-	public static function get_shortlink()
+	public static function get_shortlink(on_data:String -> Void, on_error:String -> Void)
 	{
 		var request = new haxe.Http('https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyClYWNI-sA5nXkayNwTx72uL44ZYTMg9X4');
-		var data = Json.stringify({
+		var data = {
 			dynamicLinkInfo: {
 				domainUriPrefix: "https://cardlink.page.link",
 				link: get_url()
@@ -65,11 +66,21 @@ class URLHandler
 			suffix:{
 				option:"SHORT"
 			}
-		});
+		}.stringify();
 		request.setPostData(data);
-		request.onData = (e) -> trace(e);
-		request.onError = (e) -> trace(e);
+		request.onData = on_data;
+		request.onError = on_error;
 		request.request(true);
+	}
+
+	public static function copy_to_clipboard(str:String)
+	{
+		var el = Browser.document.createTextAreaElement();
+		el.value = str;
+		Browser.document.body.appendChild(el);
+		el.select();
+		Browser.document.execCommand('copy');
+		Browser.document.body.removeChild(el);
 	}
 
 }

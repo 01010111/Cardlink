@@ -5,12 +5,12 @@ import h2d.Text;
 class Version extends Text
 {
 
-	public function new(parent:Scene)
+	public function new()
 	{
-		super(DefaultFont.get(), parent);
+		super(DefaultFont.get(), Main.i.scene);
 		color.set(1);
 		textAlign = Align.Right;
-		setPosition(parent.width - PADDING, parent.height - PADDING - 16);
+		setPosition(Main.i.scene.width - PADDING, Main.i.scene.height - PADDING - 16);
 		text = VERSION;
 	}
 

@@ -13,9 +13,9 @@ class FlipBtn extends Graphics
 	var flipped:Bool = false;
 	var can_flip:Bool = true;
 
-	public function new(parent:h2d.Object)
+	public function new()
 	{
-		super(parent);
+		super(Main.i.scene);
 		Main.i.flip = this;
 		lineStyle(1, 0xFFFFFF);
 		beginFill(0x000000);

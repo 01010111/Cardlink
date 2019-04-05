@@ -1,3 +1,4 @@
+import h2d.Scene;
 import js.Browser;
 import h2d.Object;
 import hxd.Key;
@@ -10,20 +11,22 @@ class Main extends hxd.App
 	public static var i:Main;
 
 	public var flip:FlipBtn;
+	public var scene:Scene;
 
     override function init()
 	{
 		//hxd.Res.initEmbed();
 		i = this;
-		s2d.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
+		scene = s2d;
+		scene.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
 		CardUtil.populate_deck();
-		new Grid(s2d, 0xFFFFFF, 0.25);
-		new DiscardPile(s2d);
-		new FlipBtn(s2d);
-		new Version(s2d);
-		new ShareBtn(s2d);
-		CardUtil.cards = new Object(s2d);
-		URLHandler.check_url();
+		new Grid(0xFFFFFF, 0.25);
+		new DiscardPile();
+		CardUtil.cards = new Object(scene);
+		new FlipBtn();
+		new Version();
+		new ShareBtn();
+		HttpUtil.check_url();
     }
 
 	override public function update(dt)
@@ -31,7 +34,6 @@ class Main extends hxd.App
 		super.update(dt);
 		if (any_key_pressed([Key.SPACE, Key.ENTER])) flip.click();
 		if (any_key_pressed([Key.DELETE, Key.BACKSPACE])) CardUtil.destroy_all();
-		if (any_key_pressed([Key.U])) trace(URLHandler.get_url());
 	}
 
 	function any_key_pressed(keys:Array<Int>)
