@@ -9,8 +9,12 @@ class PopUp extends Graphics
 	public function new(s:String)
 	{
 		super(Main.i.scene);
-		beginFill(0x000000, 0.5);
+		beginFill(0x000000, 0.66);
 		drawRect(0, 0, Main.i.scene.width, Main.i.scene.height);
+		endFill();
+
+		beginFill(0x000000);
+		drawRect(0, Main.i.scene.height/2 - 32, Main.i.scene.width, 64);
 		endFill();
 		
 		var text = new Text(DefaultFont.get(), this);
