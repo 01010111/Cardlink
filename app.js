@@ -2716,6 +2716,7 @@ h2d_Graphics.prototype = $extend(h2d_Drawable.prototype,{
 	,__class__: h2d_Graphics
 });
 var Card = function(x,y) {
+	this.last = { x : 0, y : 0};
 	this.locked = false;
 	this.held = false;
 	h2d_Graphics.call(this,CardUtil.cards);
@@ -2862,9 +2863,49 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 		return this.card_data;
 	}
 	,click: function(e) {
+		var _gthis = this;
 		this.bring_to_front();
 		this.int.startDrag($bind(this,this.drag));
 		this.offset = { x : e.relX, y : e.relY};
+		this.held = true;
+		this.last.x = this.x;
+		this.last.y = this.y;
+		motion_Actuate.timer(1).onComplete(function() {
+			_gthis.check_lock();
+			return;
+		});
+	}
+	,check_lock: function() {
+		if(!this.held) {
+			return;
+		}
+		if(Math.abs(this.last.x - this.x) > Constants.GRID_W) {
+			return;
+		}
+		if(Math.abs(this.last.y - this.y) > Constants.GRID_H) {
+			return;
+		}
+		if(this.locked) {
+			this.unlock();
+		} else {
+			this.lock();
+		}
+	}
+	,lock: function() {
+		this.locked = true;
+		var _this = this.text.color;
+		_this.x = 1;
+		_this.y = 0.;
+		_this.z = 0.;
+		_this.w = 1.;
+	}
+	,unlock: function() {
+		this.locked = false;
+		var _this = this.text.color;
+		_this.x = 0.;
+		_this.y = 0.;
+		_this.z = 0.;
+		_this.w = 1.;
 	}
 	,bring_to_front: function() {
 		this.parent.children.push(this.parent.children.splice(this.parent.children.indexOf(this),1)[0]);
@@ -2880,6 +2921,7 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 	,release: function(e) {
 		var _gthis = this;
 		this.int.stopDrag();
+		this.held = false;
 		motion_Actuate.tween(this,0.1,{ x : Constants.GRID_W * Math.round(this.x / Constants.GRID_W), y : Constants.GRID_H * Math.round(this.y / Constants.GRID_H)}).onComplete(function() {
 			if(_gthis.x == Constants.GRID_W && _gthis.y == Constants.GRID_H) {
 				_gthis.destroy();
@@ -3270,7 +3312,7 @@ HttpUtil.add_card = function(data) {
 	var text = data[3];
 	var card = new Card(x,y);
 	card.set_data({ text : text, suit : HttpUtil.suits[suit]});
-	card.locked = true;
+	card.lock();
 };
 HttpUtil.get_url = function() {
 	var url = "http://01010111.com/Cardlink/?";
@@ -59898,7 +59940,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.deck = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.2.0";
+Constants.VERSION = "0.2.1";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
