@@ -5,6 +5,7 @@ import Card.CardData;
 
 using Math;
 
+@:expose
 class CardUtil
 {
 
@@ -48,19 +49,21 @@ class CardUtil
 			arr[i] = b;
 			arr[j] = a;
 		}
+		for (obj in arr) if (obj == null) arr.remove(obj);
 	}
 
 	public static function get_data(card:Card) 
 	{
+		var l = deck.length;
 		shuffle(deck);
-		var data = null;
-		while (data == null) data = deck.shift();
-		card.set_data(data);
+		card.set_data(deck.pop());
+		if (l > deck.length) return;
+		deck.pop();
 	}
 
 	public static function return_data(card:Card)
 	{
-		deck.push(card.get_data());
+		if (card.get_data() != null) deck.push(card.get_data());
 	}
 
 	public static function reveal()

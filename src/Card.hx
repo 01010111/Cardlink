@@ -110,7 +110,6 @@ class Card extends Graphics
 		}
 		
 		CardUtil.add(this);
-		CardUtil.get_data(this);
 	}
 
 	var last:{x:Float, y:Float} = { x:0, y:0 };
