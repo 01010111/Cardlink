@@ -2777,7 +2777,6 @@ var Card = function(x,y) {
 		break;
 	}
 	CardUtil.add(this);
-	CardUtil.get_data(this);
 };
 $hxClasses["Card"] = Card;
 Card.__name__ = "Card";
@@ -2968,7 +2967,7 @@ var ECardsState = $hxEnums["ECardsState"] = { __ename__ : true, __constructs__ :
 	,HIDDEN: {_hx_index:1,__enum__:"ECardsState",toString:$estr}
 };
 ECardsState.__empty_constructs__ = [ECardsState.REVEALED,ECardsState.HIDDEN];
-var CardUtil = function() { };
+var CardUtil = $hx_exports["CardUtil"] = function() { };
 $hxClasses["CardUtil"] = CardUtil;
 CardUtil.__name__ = "CardUtil";
 CardUtil.populate_deck = function() {
@@ -3030,15 +3029,28 @@ CardUtil.shuffle = function(arr) {
 		arr[i] = b;
 		arr[j] = a;
 	}
+	var _g2 = 0;
+	while(_g2 < arr.length) {
+		var obj = arr[_g2];
+		++_g2;
+		if(obj == null) {
+			HxOverrides.remove(arr,obj);
+		}
+	}
 };
 CardUtil.get_data = function(card) {
+	var l = CardUtil.deck.length;
 	CardUtil.shuffle(CardUtil.deck);
-	var data = null;
-	while(data == null) data = CardUtil.deck.shift();
-	card.set_data(data);
+	card.set_data(CardUtil.deck.pop());
+	if(l > CardUtil.deck.length) {
+		return;
+	}
+	CardUtil.deck.pop();
 };
 CardUtil.return_data = function(card) {
-	CardUtil.deck.push(card.get_data());
+	if(card.get_data() != null) {
+		CardUtil.deck.push(card.get_data());
+	}
 };
 CardUtil.reveal = function() {
 	var _g = 0;
@@ -3809,6 +3821,16 @@ ShareBtn.__super__ = h2d_Graphics;
 ShareBtn.prototype = $extend(h2d_Graphics.prototype,{
 	click: function() {
 		var _gthis = this;
+		var _g = 0;
+		var _g1 = CardUtil.active_cards;
+		while(_g < _g1.length) {
+			var card = _g1[_g];
+			++_g;
+			if(card.get_data() == null) {
+				this.pop_up("Flip cards before sharing!","{}");
+				return;
+			}
+		}
 		HttpUtil.get_shortlink(function(e) {
 			_gthis.pop_up("URL copied to clipboard",e);
 			return;
@@ -59943,7 +59965,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.deck = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.2.2";
+Constants.VERSION = "0.2.3";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
