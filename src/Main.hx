@@ -1,3 +1,6 @@
+import hxd.res.DefaultFont;
+import h2d.Text;
+import motion.Actuate;
 import h2d.Scene;
 import js.Browser;
 import h2d.Object;
@@ -12,6 +15,8 @@ class Main extends hxd.App
 
 	public var flip:FlipBtn;
 	public var scene:Scene;
+	public var ui:Array<Object> = [];
+	public var instructions:Text;
 
     override function init()
 	{
@@ -20,14 +25,32 @@ class Main extends hxd.App
 		scene.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
 		CardUtil.init();
 		new Grid(0xFFFFFF, 0.25);
-		new DiscardPile();
+		ui.push(new DiscardPile());
+		ui.push(new FlipBtn());
+		ui.push(new Version());
+		ui.push(new ShareBtn());
+		ui.push(new DecksBtn());
 		CardUtil.cards = new Object(scene);
-		new FlipBtn();
-		new Version();
-		new ShareBtn();
-		new DecksBtn();
 		HttpUtil.check_url();
+		hide_ui();
     }
+
+	function hide_ui()
+	{
+		for (object in ui) object.alpha = 0;
+		instructions = new Text(DefaultFont.get(), scene);
+		instructions.setPosition(scene.width/2, scene.height/2 - 8);
+		instructions.textAlign = Align.Center;
+		instructions.text = 'Click anywhere to draw a card.';
+		instructions.color.set(1, 1, 1);
+	}
+
+	function show_ui()
+	{
+		if (ui[0].alpha > 0) return;
+		scene.removeChild(instructions);
+		for (object in ui) Actuate.tween(object, 0.5, { alpha: 1 });
+	}
 
 	override public function update(dt)
 	{
@@ -42,7 +65,11 @@ class Main extends hxd.App
 		return false;
 	}
 
-	public function add_card(x:Float, y:Float):Card return new Card(x, y);
+	public function add_card(x:Float, y:Float):Card
+	{
+		show_ui();
+		return new Card(x, y);
+	}
 
 }
 /*

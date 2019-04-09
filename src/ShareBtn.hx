@@ -35,6 +35,7 @@ class ShareBtn extends Graphics
 
     function click()
     {
+        if (alpha == 0) return;
         for (card in CardUtil.active_cards) if (card.get_data() == null) return pop_up('Flip cards before sharing!', '{}');
         HttpUtil.get_shortlink((e) -> pop_up('URL copied to clipboard', e), (e) -> pop_up('ERROR', e));
         setScale(0.75);

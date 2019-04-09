@@ -35,7 +35,7 @@ class FlipBtn extends Graphics
 
 	public function click(?e:Event)
 	{
-		if (!can_flip) return;
+		if (!can_flip || alpha == 0) return;
 		can_flip = false;
 		alpha = 0.5;
 		Actuate.timer(FLIP_TIME).onComplete(() -> {

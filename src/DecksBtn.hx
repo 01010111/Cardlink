@@ -33,6 +33,7 @@ class DecksBtn extends Graphics
 
     function click()
     {
+		if (alpha == 0) return;
         setScale(0.75);
         scale_to(0.6);
 		new DecksPopup();
