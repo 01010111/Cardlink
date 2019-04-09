@@ -1,7 +1,7 @@
 [
 	{
 		"name": "Default Deck",
-		"description": "",
+		"description": "52 card deck with curated verbs.",
 		"hearts": [
 			{ "text": "jump" },
 			{ "text": "run" },
@@ -65,7 +65,7 @@
 	},
 	{
 		"name": "Expanded Deck",
-		"description": "",
+		"description": "180 card deck with every card available.",
 		"hearts": [
 			{ "text": "ascend" },
 			{ "text": "avoid" },
@@ -104,7 +104,20 @@
 			{ "text": "vibrate" },
 			{ "text": "walk" },
 			{ "text": "wall-jump" },
-			{ "text": "weave" }
+			{ "text": "weave" },
+			{ "text": "platformer" },
+			{ "text": "shooter" },
+			{ "text": "fighting" },
+			{ "text": "hack and slash" },
+			{ "text": "stealth" },
+			{ "text": "survival" },
+			{ "text": "rhythm" },
+			{ "text": "horror" },
+			{ "text": "twitch" },
+			{ "text": "racing" },
+			{ "text": "first person" },
+			{ "text": "third person" },
+			{ "text": "emergent" }
 		],
 		"diamonds": [
 			{ "text": "compose" },
@@ -134,7 +147,20 @@
 			{ "text": "trace" },
 			{ "text": "type" },
 			{ "text": "unlock" },
-			{ "text": "verify" }
+			{ "text": "verify" },
+			{ "text": "trivia" },
+			{ "text": "cards" },
+			{ "text": "maze" },
+			{ "text": "match 3" },
+			{ "text": "casual" },
+			{ "text": "educational" },
+			{ "text": "action puzzle" },
+			{ "text": "hidden object" },
+			{ "text": "physics" },
+			{ "text": "puzzle" },
+			{ "text": "point and click" },
+			{ "text": "detective" },
+			{ "text": "sandbox" }
 		],
 		"clubs": [
 			{ "text": "bluff" },
@@ -164,7 +190,20 @@
 			{ "text": "trick" },
 			{ "text": "trounce" },
 			{ "text": "wait" },
-			{ "text": "witness" }
+			{ "text": "witness" },
+			{ "text": "4x" },
+			{ "text": "gambling" },
+			{ "text": "idle" },
+			{ "text": "co-op" },
+			{ "text": "resources" },
+			{ "text": "tactics" },
+			{ "text": "strategy" },
+			{ "text": "sports" },
+			{ "text": "turn based" },
+			{ "text": "pvp" },
+			{ "text": "real time" },
+			{ "text": "city building" },
+			{ "text": "simulation" }
 		],
 		"spades": [
 			{ "text": "carry" },
@@ -200,12 +239,25 @@
 			{ "text": "travel" },
 			{ "text": "wander" },
 			{ "text": "wear" },
-			{ "text": "wield" }
+			{ "text": "wield" },
+			{ "text": "adventure" },
+			{ "text": "dating" },
+			{ "text": "mmo" },
+			{ "text": "jrpg" },
+			{ "text": "action rpg" },
+			{ "text": "dungeon crawler" },
+			{ "text": "gachapon" },
+			{ "text": "narrative" },
+			{ "text": "open world" },
+			{ "text": "procedural" },
+			{ "text": "user created" },
+			{ "text": "text based" },
+			{ "text": "crpg" }
 		]
 	},
 	{
 		"name": "Action Deck",
-		"description": "",
+		"description": "52 card deck balanced towards action.",
 		"hearts": [
 			{ "text": "chase" },
 			{ "text": "dash" },
@@ -269,7 +321,7 @@
 	},
 	{
 		"name": "Peaceful Deck",
-		"description": "",
+		"description": "52 card deck for non-violent game ideation.",
 		"hearts": [
 			{ "text": "ascend" },
 			{ "text": "fly" },
@@ -333,7 +385,7 @@
 	},
 	{
 		"name": "Genre Deck",
-		"description": "",
+		"description": "52 card deck for exploring new genres.",
 		"hearts": [
 			{ "text": "platformer" },
 			{ "text": "shooter" },
@@ -346,7 +398,8 @@
 			{ "text": "twitch" },
 			{ "text": "racing" },
 			{ "text": "first person" },
-			{ "text": "third person" }
+			{ "text": "third person" },
+			{ "text": "emergent" }
 		],
 		"diamonds": [
 			{ "text": "trivia" },
@@ -360,7 +413,8 @@
 			{ "text": "physics" },
 			{ "text": "puzzle" },
 			{ "text": "point and click" },
-			{ "text": "detective" }
+			{ "text": "detective" },
+			{ "text": "sandbox" }
 		],
 		"clubs": [
 			{ "text": "4x" },
@@ -374,6 +428,7 @@
 			{ "text": "turn based" },
 			{ "text": "pvp" },
 			{ "text": "real time" },
+			{ "text": "city building" },
 			{ "text": "simulation" }
 		],
 		"spades": [
@@ -387,8 +442,10 @@
 			{ "text": "narrative" },
 			{ "text": "open world" },
 			{ "text": "procedural" },
+			{ "text": "user created" },
 			{ "text": "text based" },
 			{ "text": "crpg" }
 		]
 	}
 ]
+

@@ -2959,6 +2959,14 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 			return;
 		});
 	}
+	,instant_destroy: function() {
+		var _gthis = this;
+		motion_Actuate.tween(this,0.2,{ scaleX : 0, scaleY : 0, x : this.x + Constants.CARD_W * Constants.GRID_W * 0.5, y : this.y + Constants.CARD_H * Constants.GRID_H * 0.5}).onComplete(function() {
+			CardUtil.remove(_gthis);
+			_gthis.parent.removeChild(_gthis);
+			return;
+		});
+	}
 	,__class__: Card
 	,__properties__: $extend(h2d_Graphics.prototype.__properties__,{set_card_data:"set_card_data"})
 });
@@ -2970,47 +2978,47 @@ ECardsState.__empty_constructs__ = [ECardsState.REVEALED,ECardsState.HIDDEN];
 var CardUtil = $hx_exports["CardUtil"] = function() { };
 $hxClasses["CardUtil"] = CardUtil;
 CardUtil.__name__ = "CardUtil";
-CardUtil.populate_deck = function() {
-	var deck_data = JSON.parse(haxe_http_HttpJs.requestUrl("cards.json"));
-	var diamonds = deck_data.diamonds;
-	var hearts = deck_data.hearts;
-	var spades = deck_data.spades;
-	var clubs = deck_data.clubs;
-	var special = deck_data.special;
+CardUtil.init = function() {
+	CardUtil.get_decks();
+	CardUtil.populate_deck(CardUtil.decks[0]);
+};
+CardUtil.get_decks = function() {
+	CardUtil.decks = JSON.parse(haxe_http_HttpJs.requestUrl("decks.json"));
+};
+CardUtil.populate_deck = function(d) {
+	CardUtil.deck = d;
 	var _g = 0;
-	while(_g < diamonds.length) {
-		var card = diamonds[_g];
+	var _g1 = CardUtil.deck.diamonds;
+	while(_g < _g1.length) {
+		var card = _g1[_g];
 		++_g;
 		CardUtil.add_data({ text : card.text, suit : "diamonds"});
 	}
-	var _g1 = 0;
-	while(_g1 < hearts.length) {
-		var card1 = hearts[_g1];
-		++_g1;
+	var _g2 = 0;
+	var _g3 = CardUtil.deck.hearts;
+	while(_g2 < _g3.length) {
+		var card1 = _g3[_g2];
+		++_g2;
 		CardUtil.add_data({ text : card1.text, suit : "hearts"});
 	}
-	var _g2 = 0;
-	while(_g2 < spades.length) {
-		var card2 = spades[_g2];
-		++_g2;
+	var _g4 = 0;
+	var _g5 = CardUtil.deck.spades;
+	while(_g4 < _g5.length) {
+		var card2 = _g5[_g4];
+		++_g4;
 		CardUtil.add_data({ text : card2.text, suit : "spades"});
 	}
-	var _g3 = 0;
-	while(_g3 < clubs.length) {
-		var card3 = clubs[_g3];
-		++_g3;
+	var _g6 = 0;
+	var _g7 = CardUtil.deck.clubs;
+	while(_g6 < _g7.length) {
+		var card3 = _g7[_g6];
+		++_g6;
 		CardUtil.add_data({ text : card3.text, suit : "clubs"});
-	}
-	var _g4 = 0;
-	while(_g4 < special.length) {
-		var card4 = special[_g4];
-		++_g4;
-		CardUtil.add_data({ text : card4.text, suit : "special"});
 	}
 };
 CardUtil.add_data = function(data) {
 	CardUtil.num_cards++;
-	CardUtil.deck.push(data);
+	CardUtil.cards_data.push(data);
 };
 CardUtil.add = function(card) {
 	CardUtil.active_cards.push(card);
@@ -3039,17 +3047,17 @@ CardUtil.shuffle = function(arr) {
 	}
 };
 CardUtil.get_data = function(card) {
-	var l = CardUtil.deck.length;
-	CardUtil.shuffle(CardUtil.deck);
-	card.set_data(CardUtil.deck.pop());
-	if(l > CardUtil.deck.length) {
+	var l = CardUtil.cards_data.length;
+	CardUtil.shuffle(CardUtil.cards_data);
+	card.set_data(CardUtil.cards_data.pop());
+	if(l > CardUtil.cards_data.length) {
 		return;
 	}
-	CardUtil.deck.pop();
+	CardUtil.cards_data.pop();
 };
 CardUtil.return_data = function(card) {
 	if(card.get_data() != null) {
-		CardUtil.deck.push(card.get_data());
+		CardUtil.cards_data.push(card.get_data());
 	}
 };
 CardUtil.reveal = function() {
@@ -3093,9 +3101,240 @@ CardUtil.destroy_all = function() {
 		})(card));
 	}
 };
+CardUtil.swap_deck = function(deck) {
+	while(CardUtil.cards_data.length > 0) CardUtil.cards_data.pop();
+	var _g = 0;
+	var _g1 = CardUtil.active_cards;
+	while(_g < _g1.length) {
+		var card = _g1[_g];
+		++_g;
+		card.instant_destroy();
+	}
+	CardUtil.populate_deck(deck);
+};
 var Constants = function() { };
 $hxClasses["Constants"] = Constants;
 Constants.__name__ = "Constants";
+var DecksBtn = function() {
+	var _gthis = this;
+	h2d_Graphics.call(this,Main.i.scene);
+	this.smooth = true;
+	this.lineStyle(4,16711680);
+	this.drawRect(0 - DecksBtn.width / 2,8 - DecksBtn.height / 2,DecksBtn.width - 8,DecksBtn.height - 8);
+	var x = 0 - DecksBtn.width / 2;
+	var y = 8 - DecksBtn.height / 2;
+	this.addVertex(x,y,this.curR,this.curG,this.curB,this.curA,x * this.ma + y * this.mc + this.mx,x * this.mb + y * this.md + this.my);
+	var x1 = 8 - DecksBtn.width / 2;
+	var y1 = 0 - DecksBtn.height / 2;
+	this.addVertex(x1,y1,this.curR,this.curG,this.curB,this.curA,x1 * this.ma + y1 * this.mc + this.mx,x1 * this.mb + y1 * this.md + this.my);
+	var x2 = DecksBtn.width - DecksBtn.width / 2;
+	var y2 = 0 - DecksBtn.height / 2;
+	this.addVertex(x2,y2,this.curR,this.curG,this.curB,this.curA,x2 * this.ma + y2 * this.mc + this.mx,x2 * this.mb + y2 * this.md + this.my);
+	var x3 = DecksBtn.width - DecksBtn.width / 2;
+	var y3 = DecksBtn.height - 8 - DecksBtn.height / 2;
+	this.addVertex(x3,y3,this.curR,this.curG,this.curB,this.curA,x3 * this.ma + y3 * this.mc + this.mx,x3 * this.mb + y3 * this.md + this.my);
+	var x4 = DecksBtn.width - 8 - DecksBtn.width / 2;
+	var y4 = DecksBtn.height - DecksBtn.height / 2;
+	this.addVertex(x4,y4,this.curR,this.curG,this.curB,this.curA,x4 * this.ma + y4 * this.mc + this.mx,x4 * this.mb + y4 * this.md + this.my);
+	this.posChanged = true;
+	this.x = Main.i.scene.width - Constants.PADDING - DecksBtn.width - DecksBtn.width / 2;
+	this.posChanged = true;
+	this.y = 80;
+	this.posChanged = true;
+	this.scaleX = 0.5;
+	this.posChanged = true;
+	this.scaleY = 0.5;
+	var int = new h2d_Interactive(DecksBtn.width,DecksBtn.height,this);
+	int.posChanged = true;
+	int.x = -DecksBtn.width / 2;
+	int.posChanged = true;
+	int.y = -DecksBtn.height / 2;
+	int.onClick = function(e) {
+		_gthis.click();
+		return;
+	};
+	int.onOver = function(e1) {
+		_gthis.scale_to(0.6);
+		return;
+	};
+	int.onOut = function(e2) {
+		_gthis.scale_to(0.5);
+		return;
+	};
+};
+$hxClasses["DecksBtn"] = DecksBtn;
+DecksBtn.__name__ = "DecksBtn";
+DecksBtn.__super__ = h2d_Graphics;
+DecksBtn.prototype = $extend(h2d_Graphics.prototype,{
+	click: function() {
+		this.posChanged = true;
+		this.scaleX = 0.75;
+		this.posChanged = true;
+		this.scaleY = 0.75;
+		this.scale_to(0.6);
+		new DecksPopup();
+	}
+	,scale_to: function(v) {
+		motion_Actuate.tween(this,0.2,{ scaleX : v, scaleY : v});
+	}
+	,__class__: DecksBtn
+});
+var DecksPopup = function() {
+	this.decks = [];
+	h2d_Graphics.call(this,Main.i.scene);
+	this.beginFill(0);
+	this.drawRect(0,0,Main.i.scene.width,Main.i.scene.height);
+	var j = 0;
+	var _g = 0;
+	var _g1 = CardUtil.decks;
+	while(_g < _g1.length) {
+		var deck = _g1[_g];
+		++_g;
+		this.decks.push(new DeckInfo(deck,j++,this));
+	}
+	new LoadDeckBtn(j++,this);
+	this.last_deck = CardUtil.deck;
+	this.alpha = 0;
+	motion_Actuate.tween(this,0.5,{ alpha : 1});
+};
+$hxClasses["DecksPopup"] = DecksPopup;
+DecksPopup.__name__ = "DecksPopup";
+DecksPopup.__super__ = h2d_Graphics;
+DecksPopup.prototype = $extend(h2d_Graphics.prototype,{
+	select: function(deck) {
+		var _g = 0;
+		var _g1 = this.decks;
+		while(_g < _g1.length) {
+			var deck1 = _g1[_g];
+			++_g;
+			deck1.deselect();
+		}
+		this.selected_deck = deck.deck;
+		deck.select();
+	}
+	,exit: function() {
+		this.parent.removeChild(this);
+		if(this.last_deck.name != this.selected_deck.name) {
+			CardUtil.swap_deck(this.selected_deck);
+		}
+	}
+	,__class__: DecksPopup
+});
+var DeckInfo = function(deck,j,parent) {
+	this.padding = 8;
+	this.height = 48;
+	var _gthis = this;
+	h2d_Graphics.call(this,parent);
+	this.index = j;
+	this.deck = deck;
+	this.background = new h2d_Graphics(this);
+	this.background.lineStyle(2,16777215);
+	this.background.drawRect(0,0,Main.i.scene.width - this.padding * 4,this.height);
+	this.deck_name = new h2d_Text(hxd_res_DefaultFont.get(),this);
+	var _this = this.deck_name;
+	_this.posChanged = true;
+	_this.x = this.padding * 2;
+	_this.posChanged = true;
+	_this.y = this.padding;
+	this.deck_name.set_text("* " + deck.name);
+	this.description = new h2d_Text(hxd_res_DefaultFont.get(),this);
+	var _this1 = this.description;
+	_this1.posChanged = true;
+	_this1.x = this.padding * 2 + 16;
+	_this1.posChanged = true;
+	_this1.y = this.padding + 16;
+	this.description.set_text(deck.description);
+	this.posChanged = true;
+	this.x = this.padding * 2;
+	this.posChanged = true;
+	this.y = this.padding * 2 + j * (this.height + this.padding * 2);
+	if(CardUtil.deck.name == deck.name) {
+		parent.select(this);
+	} else {
+		this.deselect();
+	}
+	var int = new h2d_Interactive(Main.i.scene.width - this.padding * 4,this.height,this);
+	int.onClick = function(e) {
+		parent.select(_gthis);
+		return;
+	};
+	this.posChanged = true;
+	this.scaleX = 0;
+	motion_Actuate.tween(this,0.1,{ scaleX : 1}).delay(0.5 + j * 0.05);
+};
+$hxClasses["DeckInfo"] = DeckInfo;
+DeckInfo.__name__ = "DeckInfo";
+DeckInfo.__super__ = h2d_Graphics;
+DeckInfo.prototype = $extend(h2d_Graphics.prototype,{
+	select: function() {
+		var _this = this.deck_name.color;
+		_this.x = 1;
+		_this.y = 1;
+		_this.z = 1;
+		_this.w = 1.;
+		var _this1 = this.description.color;
+		_this1.x = 1;
+		_this1.y = 1;
+		_this1.z = 1;
+		_this1.w = 1.;
+		var _this2 = this.background.color;
+		_this2.x = 1;
+		_this2.y = 1;
+		_this2.z = 1;
+		_this2.w = 1.;
+	}
+	,deselect: function() {
+		var _this = this.deck_name.color;
+		_this.x = 1;
+		_this.y = 0.;
+		_this.z = 0.;
+		_this.w = 1.;
+		var _this1 = this.description.color;
+		_this1.x = 1;
+		_this1.y = 0.;
+		_this1.z = 0.;
+		_this1.w = 1.;
+		var _this2 = this.background.color;
+		_this2.x = 1;
+		_this2.y = 0.;
+		_this2.z = 0.;
+		_this2.w = 1.;
+	}
+	,__class__: DeckInfo
+});
+var LoadDeckBtn = function(j,parent) {
+	this.padding = 8;
+	this.height = 48;
+	h2d_Graphics.call(this,parent);
+	var background = new h2d_Graphics(this);
+	background.lineStyle(2,16777215);
+	background.drawRect(0,0,Main.i.scene.width - this.padding * 4,this.height);
+	var text = new h2d_Text(hxd_res_DefaultFont.get(),this);
+	text.posChanged = true;
+	text.x = (Main.i.scene.width - this.padding * 4) / 2;
+	text.posChanged = true;
+	text.y = Constants.PADDING + 12;
+	text.set_textAlign(h2d_Align.Center);
+	text.set_text("LOAD DECK");
+	this.posChanged = true;
+	this.x = this.padding * 2;
+	this.posChanged = true;
+	this.y = this.padding * 2 + j * (this.height + this.padding * 2);
+	var int = new h2d_Interactive(Main.i.scene.width - this.padding * 4,this.height,this);
+	int.onClick = function(e) {
+		parent.exit();
+		return;
+	};
+	this.posChanged = true;
+	this.scaleX = 0;
+	motion_Actuate.tween(this,0.1,{ scaleX : 1}).delay(0.5 + j * 0.05);
+};
+$hxClasses["LoadDeckBtn"] = LoadDeckBtn;
+LoadDeckBtn.__name__ = "LoadDeckBtn";
+LoadDeckBtn.__super__ = h2d_Graphics;
+LoadDeckBtn.prototype = $extend(h2d_Graphics.prototype,{
+	__class__: LoadDeckBtn
+});
 var DiscardPile = function() {
 	h2d_Graphics.call(this,Main.i.scene);
 	this.lineStyle(1,16711680);
@@ -3585,13 +3824,14 @@ Main.prototype = $extend(hxd_App.prototype,{
 		Main.i = this;
 		this.scene = this.s2d;
 		this.scene.setFixedSize(window.innerWidth,window.innerHeight);
-		CardUtil.populate_deck();
+		CardUtil.init();
 		new Grid(16777215,0.25);
 		new DiscardPile();
 		CardUtil.cards = new h2d_Object(this.scene);
 		new FlipBtn();
 		new Version();
 		new ShareBtn();
+		new DecksBtn();
 		HttpUtil.check_url();
 	}
 	,update: function(dt) {
@@ -59963,9 +60203,9 @@ if(ArrayBuffer.prototype.slice == null) {
 }
 CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
-CardUtil.deck = [];
+CardUtil.cards_data = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.2.3";
+Constants.VERSION = "0.3.0";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
@@ -59973,9 +60213,11 @@ Constants.CARD_R = 2;
 Constants.PADDING = 2;
 Constants.GRID_W = 16;
 Constants.GRID_H = 16;
+DecksBtn.width = 32;
+DecksBtn.height = 40;
 HttpUtil.card_separator = "+";
 HttpUtil.value_separator = "|";
-HttpUtil.suits = ["hearts","diamonds","spades","clubs","special"];
+HttpUtil.suits = ["hearts","diamonds","spades","clubs"];
 ShareBtn.radius = 20;
 Xml.Element = 0;
 Xml.PCData = 1;
