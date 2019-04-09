@@ -15,7 +15,6 @@ class Main extends hxd.App
 
     override function init()
 	{
-		//hxd.Res.initEmbed();
 		i = this;
 		scene = s2d;
 		scene.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);

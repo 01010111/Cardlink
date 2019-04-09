@@ -16,6 +16,7 @@ class DecksPopup extends Graphics
 	public function new()
 	{
 		super(Main.i.scene);
+		var int = new Interactive(Main.i.scene.width, Main.i.scene.height, this);
 		beginFill(0x000000);
 		drawRect(0, 0, Main.i.scene.width, Main.i.scene.height);
 		var j = 0;
@@ -94,7 +95,7 @@ class DeckInfo extends Graphics
 	{
 		deck_name.color.set(1);
 		description.color.set(1);
-		background.color.set(1);
+		background.color.set();
 	}
 
 }

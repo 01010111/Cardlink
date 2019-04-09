@@ -23,6 +23,7 @@ class Card extends Graphics
 	var suit_top:Text;
 	var suit_bottom:Text;
 	var int:Interactive;
+	var do_flip:Bool = false;
 
 	var card_data(default, set):CardData;
 	function set_card_data(data:CardData):CardData
@@ -91,11 +92,6 @@ class Card extends Graphics
 		b.drawRoundedRect(PADDING * 2, PADDING * 2, (CARD_W * GRID_W) - PADDING * 4, (CARD_H * GRID_H) - PADDING * 4, CARD_R);
 		b.endFill();
 
-		/*var logo = new Bitmap(hxd.Res.logo.toTile().center(), back);
-		logo.setPosition(CARD_W * GRID_W * 0.5, CARD_H * GRID_H * 0.5);
-		logo.setScale(0.25);
-		logo.smooth = true;*/
-
 		int = new Interactive((CARD_W * GRID_W), (CARD_H * GRID_H), this);
 		int.onPush = click;
 		int.onRelease = release;
@@ -127,7 +123,7 @@ class Card extends Graphics
 
 	function check_lock()
 	{
-		if (!held) return;
+		if (!held || !flipped) return;
 		if (Math.abs(last.x - x) > GRID_W) return;
 		if (Math.abs(last.y - y) > GRID_H) return;
 		locked ? unlock() : lock();
@@ -161,6 +157,15 @@ class Card extends Graphics
 		int.stopDrag();
 		held = false;
 		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == GRID_W && y == GRID_H) destroy());
+		if (do_flip) check_flip();
+		do_flip = false;
+	}
+
+	function check_flip()
+	{
+		if (flipped && CardUtil.state == REVEALED) return;
+		if (!flipped && CardUtil.state == HIDDEN) return;
+		flip(CardUtil.state == REVEALED);
 	}
 
 	public function reveal() flip(true);
@@ -168,6 +173,11 @@ class Card extends Graphics
 
 	public function flip(show:Bool)
 	{
+		if (held)
+		{
+			do_flip = true;
+			return;
+		}
 		if (!locked) show ? CardUtil.get_data(this) : CardUtil.return_data(this);
 		Actuate.tween(this, FLIP_TIME/2, { scaleX: 0, x: x + CARD_W * GRID_W * 0.5 }).onComplete(() -> {
 			front.alpha = show ? 1 : 0;
