@@ -119,7 +119,7 @@ class Card extends Graphics
 		last.x = x;
 		last.y = y;
 		Actuate.timer(1).onComplete(() -> check_lock());
-		Actuate.tween(DiscardPile.i, 0.2, { alpha: 1 });
+		Actuate.timer(0.1).onComplete(() -> check_discard_pile());
 	}
 
 	function check_lock()
@@ -128,6 +128,12 @@ class Card extends Graphics
 		if (Math.abs(last.x - x) > GRID_W) return;
 		if (Math.abs(last.y - y) > GRID_H) return;
 		locked ? unlock() : lock();
+	}
+
+	function check_discard_pile()
+	{
+		if (!held) return;
+		Actuate.tween(DiscardPile.i, 0.2, { alpha: 1 });
 	}
 
 	public function lock()
@@ -158,9 +164,9 @@ class Card extends Graphics
 		int.stopDrag();
 		held = false;
 		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == DiscardPile.i.x && y == DiscardPile.i.y) destroy());
+		Actuate.tween(DiscardPile.i, 4, { alpha: 0 });
 		if (do_flip) check_flip();
 		do_flip = false;
-		Actuate.tween(DiscardPile.i, 4, { alpha: 0 });
 	}
 
 	function check_flip()

@@ -20,8 +20,19 @@ class HelpPopup extends Graphics
 		text.color.set(1, 1, 1);
 		text.textAlign = Align.Left;
 		text.maxWidth = 300;
-		text.setPosition(Main.i.scene.width/2 - 150, Main.i.scene.height/2 - 300);
+		text.setPosition(Main.i.scene.width/2 - 150, Main.i.scene.height/2 - 304);
 		text.text = "Welcome to Cardlink.\n\nCardlink is an intuitive way to generate ideas for game mechanics by physically placing cards, mentally assigning relationships to the cards based on how you've arranged them, and then revealing the cards' values.\n\nTo place a card, click anywhere on the grid.\n\nTo remove a card, drag it to the discard pile marked 'REMOVE'.\n\nTo remove all cards, use the keyboard shortcuts [DELETE] or [BACKSPACE].\n\nTo reveal or hide cards, use the button marked 'REVEAL/HIDE' or use the keyboard shortcuts [SPACE] or [ENTER].\n\nTo share the state of Cardlink, or save the state for later, hit the share button in the upper right hand corner.\n\nTo switch decks, use the deck button located under the share button.";
+
+		var suits = new Text(DefaultFont.get(), this);
+		suits.color.set(1);
+		suits.textAlign = Align.Left;
+		suits.maxWidth = 300;
+		suits.setPosition(Main.i.scene.width/2 - 150, Main.i.scene.height/2 + 192);
+		suits.text += "\nFor the most part, Cardlink attributes the following suits to each card:";
+		suits.text += "\n* H - Hearts - Action - To Do";
+		suits.text += "\n* D - Diamonds - Puzzle - To Solve";
+		suits.text += "\n* C - Clubs - Strategy - To Plan";
+		suits.text += "\n* S - Spades - Role Playing - To Be";
 
 		new ReturnBtn(this);
 
@@ -55,7 +66,7 @@ class ReturnBtn extends Graphics
 		text.textAlign = Align.Center;
 		text.text = 'RETURN';
 
-		setPosition(Main.i.scene.width/2 - 150, Main.i.scene.height/2 + 144);
+		setPosition(Main.i.scene.width/2 - 150, Main.i.scene.height/2 + 136);
 
 		var int = new Interactive(Main.i.scene.width - padding * 4, height, this);
 		int.onClick = (e) -> parent.exit();

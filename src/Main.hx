@@ -25,10 +25,10 @@ class Main extends hxd.App
 		scene.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
 		CardUtil.init();
 		new Grid(0xFFFFFF, 0.25);
-		ui.push(new DiscardPile());
-		ui.push(new FlipBtn());
+		new DiscardPile();
+		new HelpBtn();
 		ui.push(new Version());
-		ui.push(new HelpBtn());
+		ui.push(new FlipBtn());
 		ui.push(new ShareBtn());
 		ui.push(new DecksBtn());
 		CardUtil.cards = new Object(scene);
@@ -40,9 +40,10 @@ class Main extends hxd.App
 	{
 		for (object in ui) object.alpha = 0;
 		instructions = new Text(DefaultFont.get(), scene);
-		instructions.setPosition(scene.width/2, scene.height/2 - 8);
+		instructions.setPosition(scene.width/2 - 150, scene.height/2 - 8);
 		instructions.textAlign = Align.Center;
-		instructions.text = 'Click anywhere to draw a card.';
+		instructions.maxWidth = 300;
+		instructions.text = 'Click anywhere to draw a card. Press the [?] button in the bottom right hand corner for help';
 		instructions.color.set(1, 1, 1);
 	}
 
