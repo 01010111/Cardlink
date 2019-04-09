@@ -2874,7 +2874,10 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 			_gthis.check_lock();
 			return;
 		});
-		motion_Actuate.tween(DiscardPile.i,0.2,{ alpha : 1});
+		motion_Actuate.timer(0.1).onComplete(function() {
+			_gthis.check_discard_pile();
+			return;
+		});
 	}
 	,check_lock: function() {
 		if(!this.held || !this.flipped) {
@@ -2891,6 +2894,12 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 		} else {
 			this.lock();
 		}
+	}
+	,check_discard_pile: function() {
+		if(!this.held) {
+			return;
+		}
+		motion_Actuate.tween(DiscardPile.i,0.2,{ alpha : 1});
 	}
 	,lock: function() {
 		this.locked = true;
@@ -2929,11 +2938,11 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 			}
 			return;
 		});
+		motion_Actuate.tween(DiscardPile.i,4,{ alpha : 0});
 		if(this.do_flip) {
 			this.check_flip();
 		}
 		this.do_flip = false;
-		motion_Actuate.tween(DiscardPile.i,4,{ alpha : 0});
 	}
 	,check_flip: function() {
 		if(this.flipped && CardUtil.state == ECardsState.REVEALED) {
@@ -3366,8 +3375,7 @@ LoadDeckBtn.prototype = $extend(h2d_Graphics.prototype,{
 var DiscardPile = function() {
 	DiscardPile.i = this;
 	h2d_Graphics.call(this,Main.i.scene);
-	this.lineStyle(2,16711680);
-	this.drawRect(Constants.PADDING * 2,Constants.PADDING * 2,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 4,Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 4);
+	this.draw_pile();
 	this.posChanged = true;
 	this.x = Constants.GRID_W;
 	this.posChanged = true;
@@ -3390,7 +3398,58 @@ $hxClasses["DiscardPile"] = DiscardPile;
 DiscardPile.__name__ = "DiscardPile";
 DiscardPile.__super__ = h2d_Graphics;
 DiscardPile.prototype = $extend(h2d_Graphics.prototype,{
-	__class__: DiscardPile
+	draw_pile: function() {
+		var p1 = [];
+		var p2 = [];
+		var width = Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 4;
+		var height = Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 4;
+		var d = 8;
+		var ii = Math.floor(width / d);
+		var jj = Math.floor(height / d);
+		var _g = 0;
+		var _g1 = jj;
+		while(_g < _g1) {
+			var i = _g++;
+			p1.push({ x : 0, y : d * i});
+		}
+		var _g2 = 0;
+		var _g3 = ii;
+		while(_g2 < _g3) {
+			var i1 = _g2++;
+			p1.push({ x : d * i1, y : height});
+		}
+		var _g4 = 0;
+		var _g5 = ii;
+		while(_g4 < _g5) {
+			var i2 = _g4++;
+			p2.push({ x : d * i2, y : 0});
+		}
+		var _g6 = 0;
+		var _g7 = jj;
+		while(_g6 < _g7) {
+			var i3 = _g6++;
+			p2.push({ x : width, y : d * i3});
+		}
+		haxe_Log.trace(p1,{ fileName : "src/DiscardPile.hx", lineNumber : 53, className : "DiscardPile", methodName : "draw_pile"});
+		haxe_Log.trace("" + width + "/" + height,{ fileName : "src/DiscardPile.hx", lineNumber : 55, className : "DiscardPile", methodName : "draw_pile"});
+		var _g8 = 0;
+		var _g9 = p1.length;
+		while(_g8 < _g9) {
+			var i4 = _g8++;
+			this.lineStyle(1,16711680);
+			var x = p1[i4].x + Constants.PADDING * 2;
+			var y = p1[i4].y + Constants.PADDING * 2;
+			this.addVertex(x,y,this.curR,this.curG,this.curB,this.curA,x * this.ma + y * this.mc + this.mx,x * this.mb + y * this.md + this.my);
+			var x1 = p2[i4].x + Constants.PADDING * 2;
+			var y1 = p2[i4].y + Constants.PADDING * 2;
+			this.addVertex(x1,y1,this.curR,this.curG,this.curB,this.curA,x1 * this.ma + y1 * this.mc + this.mx,x1 * this.mb + y1 * this.md + this.my);
+			this.lineStyle();
+		}
+		this.beginFill();
+		this.drawRect(width / 2 - 32 + Constants.PADDING * 2,height / 2 - 10 + Constants.PADDING * 2,64,20);
+		this.endFill();
+	}
+	,__class__: DiscardPile
 });
 var EReg = function(r,opt) {
 	this.r = new RegExp(r,opt.split("u").join(""));
@@ -4019,8 +4078,30 @@ var HelpPopup = function() {
 	text.posChanged = true;
 	text.x = Main.i.scene.width / 2 - 150;
 	text.posChanged = true;
-	text.y = Main.i.scene.height / 2 - 300;
+	text.y = Main.i.scene.height / 2 - 304;
 	text.set_text("Welcome to Cardlink.\n\nCardlink is an intuitive way to generate ideas for game mechanics by physically placing cards, mentally assigning relationships to the cards based on how you've arranged them, and then revealing the cards' values.\n\nTo place a card, click anywhere on the grid.\n\nTo remove a card, drag it to the discard pile marked 'REMOVE'.\n\nTo remove all cards, use the keyboard shortcuts [DELETE] or [BACKSPACE].\n\nTo reveal or hide cards, use the button marked 'REVEAL/HIDE' or use the keyboard shortcuts [SPACE] or [ENTER].\n\nTo share the state of Cardlink, or save the state for later, hit the share button in the upper right hand corner.\n\nTo switch decks, use the deck button located under the share button.");
+	var suits = new h2d_Text(hxd_res_DefaultFont.get(),this);
+	var _this1 = suits.color;
+	_this1.x = 1;
+	_this1.y = 0.;
+	_this1.z = 0.;
+	_this1.w = 1.;
+	suits.set_textAlign(h2d_Align.Left);
+	suits.set_maxWidth(300);
+	suits.posChanged = true;
+	suits.x = Main.i.scene.width / 2 - 150;
+	suits.posChanged = true;
+	suits.y = Main.i.scene.height / 2 + 192;
+	var _g = suits;
+	_g.set_text(_g.text + "\nFor the most part, Cardlink attributes the following suits to each card:");
+	var _g1 = suits;
+	_g1.set_text(_g1.text + "\n* H - Hearts - Action - To Do");
+	var _g2 = suits;
+	_g2.set_text(_g2.text + "\n* D - Diamonds - Puzzle - To Solve");
+	var _g3 = suits;
+	_g3.set_text(_g3.text + "\n* C - Clubs - Strategy - To Plan");
+	var _g4 = suits;
+	_g4.set_text(_g4.text + "\n* S - Spades - Role Playing - To Be");
 	new ReturnBtn(this);
 	this.alpha = 0;
 	motion_Actuate.tween(this,0.5,{ alpha : 1});
@@ -4051,7 +4132,7 @@ var ReturnBtn = function(parent) {
 	this.posChanged = true;
 	this.x = Main.i.scene.width / 2 - 150;
 	this.posChanged = true;
-	this.y = Main.i.scene.height / 2 + 144;
+	this.y = Main.i.scene.height / 2 + 136;
 	var int = new h2d_Interactive(Main.i.scene.width - this.padding * 4,this.height,this);
 	int.onClick = function(e) {
 		parent.exit();
@@ -4387,10 +4468,10 @@ Main.prototype = $extend(hxd_App.prototype,{
 		this.scene.setFixedSize(window.innerWidth,window.innerHeight);
 		CardUtil.init();
 		new Grid(16777215,0.25);
-		this.ui.push(new DiscardPile());
-		this.ui.push(new FlipBtn());
+		new DiscardPile();
+		new HelpBtn();
 		this.ui.push(new Version());
-		this.ui.push(new HelpBtn());
+		this.ui.push(new FlipBtn());
 		this.ui.push(new ShareBtn());
 		this.ui.push(new DecksBtn());
 		CardUtil.cards = new h2d_Object(this.scene);
@@ -4408,11 +4489,12 @@ Main.prototype = $extend(hxd_App.prototype,{
 		this.instructions = new h2d_Text(hxd_res_DefaultFont.get(),this.scene);
 		var _this = this.instructions;
 		_this.posChanged = true;
-		_this.x = this.scene.width / 2;
+		_this.x = this.scene.width / 2 - 150;
 		_this.posChanged = true;
 		_this.y = this.scene.height / 2 - 8;
 		this.instructions.set_textAlign(h2d_Align.Center);
-		this.instructions.set_text("Click anywhere to draw a card.");
+		this.instructions.set_maxWidth(300);
+		this.instructions.set_text("Click anywhere to draw a card. Press the [?] button in the bottom right hand corner for help");
 		var _this1 = this.instructions.color;
 		_this1.x = 1;
 		_this1.y = 1;
