@@ -12,8 +12,8 @@ using Math;
 class Card extends Graphics
 {
 
+	public var locked:Bool = false;
 	var held:Bool = false;
-	var locked:Bool = false;
 	var flipped:Bool;
 	var offset:{x:Float,y:Float};
 

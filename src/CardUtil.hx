@@ -90,8 +90,10 @@ class CardUtil
 		var i = 0;
 		for (card in cards) Actuate.timer((cards.numChildren -  i++) * 0.1).onComplete(() -> {
 			var card:Card = cast card;
-			card.bring_to_front();
-			Actuate.tween(card, 0.2, { x: GRID_W, y: GRID_H }).onComplete(() -> card.destroy());
+			if (!card.locked) {
+				card.bring_to_front();
+				Actuate.tween(card, 0.2, { x: GRID_W, y: GRID_H }).onComplete(() -> card.destroy());
+			}
 		});
 	}
 
