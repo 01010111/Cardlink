@@ -21,7 +21,7 @@ class FlipBtn extends Graphics
 		beginFill(0x000000);
 		drawRect(PADDING * 2, PADDING * 2, (CARD_W * GRID_W) - PADDING * 4, GRID_H * 2 - PADDING * 4);
 		endFill();
-		setPosition(GRID_W, GRID_H + (CARD_H * GRID_H));
+		setPosition(GRID_W, GRID_H);
 
 		text = new Text(DefaultFont.get(), this);
 		text.color.set(1,1,1);

@@ -19,6 +19,7 @@ class DecksPopup extends Graphics
 		var int = new Interactive(Main.i.scene.width, Main.i.scene.height, this);
 		beginFill(0x000000);
 		drawRect(0, 0, Main.i.scene.width, Main.i.scene.height);
+		endFill();
 		var j = 0;
 		for (deck in CardUtil.decks) decks.push(new DeckInfo(deck, j++, this));
 		new LoadDeckBtn(j++, this);

@@ -119,6 +119,7 @@ class Card extends Graphics
 		last.x = x;
 		last.y = y;
 		Actuate.timer(1).onComplete(() -> check_lock());
+		Actuate.tween(DiscardPile.i, 0.2, { alpha: 1 });
 	}
 
 	function check_lock()
@@ -156,9 +157,10 @@ class Card extends Graphics
 	{
 		int.stopDrag();
 		held = false;
-		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == GRID_W && y == GRID_H) destroy());
+		Actuate.tween(this, 0.1, { x: GRID_W * (x / GRID_W).round(), y: GRID_H * (y / GRID_H).round() }).onComplete(() -> if (x == DiscardPile.i.x && y == DiscardPile.i.y) destroy());
 		if (do_flip) check_flip();
 		do_flip = false;
+		Actuate.tween(DiscardPile.i, 4, { alpha: 0 });
 	}
 
 	function check_flip()

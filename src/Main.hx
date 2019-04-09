@@ -28,6 +28,7 @@ class Main extends hxd.App
 		ui.push(new DiscardPile());
 		ui.push(new FlipBtn());
 		ui.push(new Version());
+		ui.push(new HelpBtn());
 		ui.push(new ShareBtn());
 		ui.push(new DecksBtn());
 		CardUtil.cards = new Object(scene);

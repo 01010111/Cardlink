@@ -92,7 +92,7 @@ class CardUtil
 			var card:Card = cast card;
 			if (!card.locked) {
 				card.bring_to_front();
-				Actuate.tween(card, 0.2, { x: GRID_W, y: GRID_H }).onComplete(() -> card.destroy());
+				Actuate.tween(card, 0.2, { x: DiscardPile.i.x, y: DiscardPile.i.y }).onComplete(() -> card.destroy());
 			}
 		});
 	}
