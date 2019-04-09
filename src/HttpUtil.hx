@@ -9,7 +9,7 @@ class HttpUtil
 
 	static var card_separator:String = '+';
 	static var value_separator:String = '|';
-	static var suits:Array<String> = ['hearts', 'diamonds', 'spades', 'clubs', 'special'];
+	static var suits:Array<String> = ['hearts', 'diamonds', 'spades', 'clubs'];
 
 	public static function check_url()
 	{

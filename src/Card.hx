@@ -186,6 +186,14 @@ class Card extends Graphics
 		});
 	}
 
+	public function instant_destroy()
+	{
+		Actuate.tween(this, 0.2, { scaleX: 0, scaleY: 0, x: x + CARD_W * GRID_W * 0.5, y: y + CARD_H * GRID_H * 0.5 }).onComplete(() -> {
+			CardUtil.remove(this);
+			parent.removeChild(this);
+		});
+	}
+
 }
 
 typedef CardData =

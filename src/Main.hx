@@ -19,13 +19,14 @@ class Main extends hxd.App
 		i = this;
 		scene = s2d;
 		scene.setFixedSize(Browser.window.innerWidth, Browser.window.innerHeight);
-		CardUtil.populate_deck();
+		CardUtil.init();
 		new Grid(0xFFFFFF, 0.25);
 		new DiscardPile();
 		CardUtil.cards = new Object(scene);
 		new FlipBtn();
 		new Version();
 		new ShareBtn();
+		new DecksBtn();
 		HttpUtil.check_url();
     }
 

@@ -12,28 +12,35 @@ class CardUtil
 	public static var state:ECardsState = HIDDEN;
 	public static var active_cards:Array<Card> = [];
 	public static var cards:Object;
-	public static var deck:Array<CardData> = [];
+	public static var cards_data:Array<CardData> = [];
 	public static var num_cards:Int = 0;
+	public static var decks:Array<Deck>;
+	public static var deck:Deck;
 
-	public static function populate_deck()
+	public static function init()
 	{
-		var deck_data = Json.parse(haxe.Http.requestUrl('cards.json'));
-		var diamonds:Array<{text:String}> = deck_data.diamonds;
-		var hearts:Array<{text:String}> = deck_data.hearts;
-		var spades:Array<{text:String}> = deck_data.spades;
-		var clubs:Array<{text:String}> = deck_data.clubs;
-		var special:Array<{text:String}> = deck_data.special;
-		for (card in diamonds) add_data({ text:card.text, suit:'diamonds' });
-		for (card in hearts) add_data({ text:card.text, suit:'hearts' });
-		for (card in spades) add_data({ text:card.text, suit:'spades' });
-		for (card in clubs) add_data({ text:card.text, suit:'clubs' });
-		for (card in special) add_data({ text:card.text, suit:'special' });
+		get_decks();
+		populate_deck(decks[0]);
+	}
+
+	public static function get_decks()
+	{
+		decks = cast Json.parse(haxe.Http.requestUrl('decks.json'));
+	}
+
+	public static function populate_deck(d:Deck)
+	{
+		deck = d;
+		for (card in deck.diamonds) add_data({ text:card.text, suit:'diamonds' });
+		for (card in deck.hearts) add_data({ text:card.text, suit:'hearts' });
+		for (card in deck.spades) add_data({ text:card.text, suit:'spades' });
+		for (card in deck.clubs) add_data({ text:card.text, suit:'clubs' });
 	}
 
 	static function add_data(data:CardData)
 	{
 		num_cards++;
-		deck.push(data);
+		cards_data.push(data);
 	}
 
 	public static function add(card:Card) active_cards.push(card);
@@ -54,16 +61,16 @@ class CardUtil
 
 	public static function get_data(card:Card) 
 	{
-		var l = deck.length;
-		shuffle(deck);
-		card.set_data(deck.pop());
-		if (l > deck.length) return;
-		deck.pop();
+		var l = cards_data.length;
+		shuffle(cards_data);
+		card.set_data(cards_data.pop());
+		if (l > cards_data.length) return;
+		cards_data.pop();
 	}
 
 	public static function return_data(card:Card)
 	{
-		if (card.get_data() != null) deck.push(card.get_data());
+		if (card.get_data() != null) cards_data.push(card.get_data());
 	}
 
 	public static function reveal()
@@ -88,10 +95,27 @@ class CardUtil
 		});
 	}
 
+	public static function swap_deck(deck:Deck)
+	{
+		while(cards_data.length > 0) cards_data.pop();
+		for (card in active_cards) card.instant_destroy();
+		populate_deck(deck);
+	}
+
 }
 
 enum ECardsState
 {
 	REVEALED;
 	HIDDEN;
+}
+
+typedef Deck =
+{
+	name:String,
+	description:String,
+	hearts:Array<{text:String}>,
+	diamonds:Array<{text:String}>,
+	clubs:Array<{text:String}>,
+	spades:Array<{text:String}>,
 }
