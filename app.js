@@ -2717,6 +2717,7 @@ h2d_Graphics.prototype = $extend(h2d_Drawable.prototype,{
 });
 var Card = function(x,y) {
 	this.last = { x : 0, y : 0};
+	this.do_flip = false;
 	this.locked = false;
 	this.held = false;
 	h2d_Graphics.call(this,CardUtil.cards);
@@ -2875,7 +2876,7 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 		});
 	}
 	,check_lock: function() {
-		if(!this.held) {
+		if(!this.held || !this.flipped) {
 			return;
 		}
 		if(Math.abs(this.last.x - this.x) > Constants.GRID_W) {
@@ -2927,6 +2928,19 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 			}
 			return;
 		});
+		if(this.do_flip) {
+			this.check_flip();
+		}
+		this.do_flip = false;
+	}
+	,check_flip: function() {
+		if(this.flipped && CardUtil.state == ECardsState.REVEALED) {
+			return;
+		}
+		if(!this.flipped && CardUtil.state == ECardsState.HIDDEN) {
+			return;
+		}
+		this.flip(CardUtil.state == ECardsState.REVEALED);
 	}
 	,reveal: function() {
 		this.flip(true);
@@ -2936,6 +2950,10 @@ Card.prototype = $extend(h2d_Graphics.prototype,{
 	}
 	,flip: function(show) {
 		var _gthis = this;
+		if(this.held) {
+			this.do_flip = true;
+			return;
+		}
 		if(!this.locked) {
 			if(show) {
 				CardUtil.get_data(this);
@@ -3182,6 +3200,7 @@ DecksBtn.prototype = $extend(h2d_Graphics.prototype,{
 var DecksPopup = function() {
 	this.decks = [];
 	h2d_Graphics.call(this,Main.i.scene);
+	var int = new h2d_Interactive(Main.i.scene.width,Main.i.scene.height,this);
 	this.beginFill(0);
 	this.drawRect(0,0,Main.i.scene.width,Main.i.scene.height);
 	var j = 0;
@@ -3295,7 +3314,7 @@ DeckInfo.prototype = $extend(h2d_Graphics.prototype,{
 		_this1.z = 0.;
 		_this1.w = 1.;
 		var _this2 = this.background.color;
-		_this2.x = 1;
+		_this2.x = 0.;
 		_this2.y = 0.;
 		_this2.z = 0.;
 		_this2.w = 1.;
@@ -60205,7 +60224,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.cards_data = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.3.0";
+Constants.VERSION = "0.3.1";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;

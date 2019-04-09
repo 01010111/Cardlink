@@ -65,7 +65,7 @@
 	},
 	{
 		"name": "Expanded Deck",
-		"description": "180 card deck with every card available.",
+		"description": "191 card deck with every card available.",
 		"hearts": [
 			{ "text": "ascend" },
 			{ "text": "avoid" },
@@ -117,7 +117,11 @@
 			{ "text": "racing" },
 			{ "text": "first person" },
 			{ "text": "third person" },
-			{ "text": "emergent" }
+			{ "text": "emergent" },
+			{ "text": "block" },
+			{ "text": "dance" },
+			{ "text": "explode" },
+			{ "text": "animate" }
 		],
 		"diamonds": [
 			{ "text": "compose" },
@@ -160,7 +164,10 @@
 			{ "text": "puzzle" },
 			{ "text": "point and click" },
 			{ "text": "detective" },
-			{ "text": "sandbox" }
+			{ "text": "sandbox" },
+			{ "text": "fit" },
+			{ "text": "complete" },
+			{ "text": "erase" }
 		],
 		"clubs": [
 			{ "text": "bluff" },
@@ -203,7 +210,9 @@
 			{ "text": "pvp" },
 			{ "text": "real time" },
 			{ "text": "city building" },
-			{ "text": "simulation" }
+			{ "text": "simulation" },
+			{ "text": "build" },
+			{ "text": "engage" }
 		],
 		"spades": [
 			{ "text": "carry" },
@@ -252,7 +261,9 @@
 			{ "text": "procedural" },
 			{ "text": "user created" },
 			{ "text": "text based" },
-			{ "text": "crpg" }
+			{ "text": "crpg" },
+			{ "text": "smootch" },
+			{ "text": "emit" }
 		]
 	},
 	{
@@ -446,6 +457,73 @@
 			{ "text": "text based" },
 			{ "text": "crpg" }
 		]
+	},
+	{
+		"name": "Legacy Deck",
+		"description": "52 card deck from original pico-8 build.",
+		"hearts": [
+			{ "text": "jump" },
+			{ "text": "shoot" },
+			{ "text": "block" },
+			{ "text": "chase" },
+			{ "text": "follow" },
+			{ "text": "die" },
+			{ "text": "engage" },
+			{ "text": "descend" },
+			{ "text": "ascend" },
+			{ "text": "race" },
+			{ "text": "run" },
+			{ "text": "avoid" },
+			{ "text": "grab" },
+			{ "text": "dash" }
+		],
+		"diamonds": [
+			{ "text": "smootch" },
+			{ "text": "resize" },
+			{ "text": "speed up" },
+			{ "text": "dance" },
+			{ "text": "complete" },
+			{ "text": "draw" },
+			{ "text": "stack" },
+			{ "text": "shuffle" },
+			{ "text": "build" },
+			{ "text": "fit" },
+			{ "text": "emit" },
+			{ "text": "explode" },
+			{ "text": "erase" },
+			{ "text": "animate" }
+		],
+		"clubs": [
+			{ "text": "arouse" },
+			{ "text": "wait" },
+			{ "text": "aim" },
+			{ "text": "match" },
+			{ "text": "advance" },
+			{ "text": "preempt" },
+			{ "text": "capture" },
+			{ "text": "bluff" },
+			{ "text": "escape" },
+			{ "text": "control" },
+			{ "text": "invest" },
+			{ "text": "build" },
+			{ "text": "pull" },
+			{ "text": "push" }
+		],
+		"spades": [
+			{ "text": "discover" },
+			{ "text": "carry" },
+			{ "text": "explore" },
+			{ "text": "collect" },
+			{ "text": "combine" },
+			{ "text": "cast" },
+			{ "text": "customize" },
+			{ "text": "improve" },
+			{ "text": "roll" },
+			{ "text": "unlock" },
+			{ "text": "wield" },
+			{ "text": "open" },
+			{ "text": "pick up" },
+			{ "text": "talk" }
+		]
 	}
 ]
-
