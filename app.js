@@ -2718,8 +2718,8 @@ h2d_Graphics.prototype = $extend(h2d_Drawable.prototype,{
 var Card = function(x,y) {
 	this.last = { x : 0, y : 0};
 	this.do_flip = false;
-	this.locked = false;
 	this.held = false;
+	this.locked = false;
 	h2d_Graphics.call(this,CardUtil.cards);
 	this.beginFill(0);
 	this.drawRoundedRect(Constants.PADDING - 1,Constants.PADDING - 1,Constants.CARD_W * Constants.GRID_W - Constants.PADDING * 2 + 2,Constants.CARD_H * Constants.GRID_H - Constants.PADDING * 2 + 2,Constants.CARD_R);
@@ -3108,13 +3108,16 @@ CardUtil.destroy_all = function() {
 		motion_Actuate.timer((CardUtil.cards.children.length - i++) * 0.1).onComplete((function(card1) {
 			return function() {
 				var card2 = card1[0];
-				card2.bring_to_front();
-				return motion_Actuate.tween(card2,0.2,{ x : Constants.GRID_W, y : Constants.GRID_H}).onComplete((function() {
-					return function() {
-						card2.destroy();
-						return;
-					};
-				})());
+				if(!card2.locked) {
+					card2.bring_to_front();
+					motion_Actuate.tween(card2,0.2,{ x : Constants.GRID_W, y : Constants.GRID_H}).onComplete((function() {
+						return function() {
+							card2.destroy();
+							return;
+						};
+					})());
+				}
+				return;
 			};
 		})(card));
 	}
@@ -3185,6 +3188,9 @@ DecksBtn.__name__ = "DecksBtn";
 DecksBtn.__super__ = h2d_Graphics;
 DecksBtn.prototype = $extend(h2d_Graphics.prototype,{
 	click: function() {
+		if(this.alpha == 0) {
+			return;
+		}
 		this.posChanged = true;
 		this.scaleX = 0.75;
 		this.posChanged = true;
@@ -3466,7 +3472,7 @@ FlipBtn.__super__ = h2d_Graphics;
 FlipBtn.prototype = $extend(h2d_Graphics.prototype,{
 	click: function(e) {
 		var _gthis = this;
-		if(!this.can_flip) {
+		if(!this.can_flip || this.alpha == 0) {
 			return;
 		}
 		this.can_flip = false;
@@ -3830,6 +3836,7 @@ hxd_App.prototype = {
 	,__class__: hxd_App
 };
 var Main = function() {
+	this.ui = [];
 	hxd_App.call(this);
 };
 $hxClasses["Main"] = Main;
@@ -3845,13 +3852,49 @@ Main.prototype = $extend(hxd_App.prototype,{
 		this.scene.setFixedSize(window.innerWidth,window.innerHeight);
 		CardUtil.init();
 		new Grid(16777215,0.25);
-		new DiscardPile();
+		this.ui.push(new DiscardPile());
+		this.ui.push(new FlipBtn());
+		this.ui.push(new Version());
+		this.ui.push(new ShareBtn());
+		this.ui.push(new DecksBtn());
 		CardUtil.cards = new h2d_Object(this.scene);
-		new FlipBtn();
-		new Version();
-		new ShareBtn();
-		new DecksBtn();
 		HttpUtil.check_url();
+		this.hide_ui();
+	}
+	,hide_ui: function() {
+		var _g = 0;
+		var _g1 = this.ui;
+		while(_g < _g1.length) {
+			var object = _g1[_g];
+			++_g;
+			object.alpha = 0;
+		}
+		this.instructions = new h2d_Text(hxd_res_DefaultFont.get(),this.scene);
+		var _this = this.instructions;
+		_this.posChanged = true;
+		_this.x = this.scene.width / 2;
+		_this.posChanged = true;
+		_this.y = this.scene.height / 2 - 8;
+		this.instructions.set_textAlign(h2d_Align.Center);
+		this.instructions.set_text("Click anywhere to draw a card.");
+		var _this1 = this.instructions.color;
+		_this1.x = 1;
+		_this1.y = 1;
+		_this1.z = 1;
+		_this1.w = 1.;
+	}
+	,show_ui: function() {
+		if(this.ui[0].alpha > 0) {
+			return;
+		}
+		this.scene.removeChild(this.instructions);
+		var _g = 0;
+		var _g1 = this.ui;
+		while(_g < _g1.length) {
+			var object = _g1[_g];
+			++_g;
+			motion_Actuate.tween(object,0.5,{ alpha : 1});
+		}
 	}
 	,update: function(dt) {
 		hxd_App.prototype.update.call(this,dt);
@@ -3874,6 +3917,7 @@ Main.prototype = $extend(hxd_App.prototype,{
 		return false;
 	}
 	,add_card: function(x,y) {
+		this.show_ui();
 		return new Card(x,y);
 	}
 	,__class__: Main
@@ -4080,6 +4124,9 @@ ShareBtn.__super__ = h2d_Graphics;
 ShareBtn.prototype = $extend(h2d_Graphics.prototype,{
 	click: function() {
 		var _gthis = this;
+		if(this.alpha == 0) {
+			return;
+		}
 		var _g = 0;
 		var _g1 = CardUtil.active_cards;
 		while(_g < _g1.length) {
@@ -60224,7 +60271,7 @@ CardUtil.state = ECardsState.HIDDEN;
 CardUtil.active_cards = [];
 CardUtil.cards_data = [];
 CardUtil.num_cards = 0;
-Constants.VERSION = "0.3.1";
+Constants.VERSION = "0.3.2";
 Constants.FLIP_TIME = 0.12;
 Constants.CARD_W = 8;
 Constants.CARD_H = 12;
